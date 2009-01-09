@@ -103,12 +103,13 @@ public class PeasyCam
 			{
 				float dx = p.mouseX - p.pmouseX;
 				float dy = p.mouseY - p.pmouseY;
-				if (p.mouseButton == PConstants.LEFT)
-					mouseRotate(dx, dy);
-				else if (p.mouseButton == PConstants.RIGHT)
-					mouseZoom(dy);
-				else
+				final int b = p.mouseButton;
+				if (b == PConstants.CENTER || (b == PConstants.LEFT && e.isMetaDown()))
 					mousePan(dx, dy);
+				else if (b == PConstants.LEFT)
+					mouseRotate(dx, dy);
+				else if (b == PConstants.RIGHT)
+					mouseZoom(dy);
 			}
 		}
 

@@ -39,13 +39,13 @@ body {
 #about,
 #download,
 #examples,
-#demos,
 #misc {
 	width:480px;
 	float:left;
 	margin-right:24px;
 }
 
+#demos { float: right; } 
 
 #resources, #info {
 	width:320px;
@@ -106,7 +106,7 @@ p {
 
 pre, code {  
 	font-family:"Consolas", "Courier New", Courier, monospace; 
-	font-size:1.5em; 
+	font-size:1em; 
 	line-height:normal;
 }
 
@@ -200,3 +200,5 @@ a:link:visited {
 #footer a, #menu a {
 	color:#333;
 }
+
+td { vertical-align: top; padding-right: 1em }

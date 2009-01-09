@@ -22,7 +22,7 @@
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />
-	<property name="tested:processingVersion" value="1.0" />
+	<property name="tested:processingVersion" value="1.0.1" />
 	<property name="tested:dependencies" value="" />
 	<property name="source:host" value="google code" />
 	<property name="source:url" value="http://code.google.com/p/peasycam" />
@@ -115,7 +115,7 @@
 		<!-- zip the distribution of the library -->
 		<zip destfile="${dist}/${libraryName}.zip" basedir="${dist}" excludes="**/_DS.Store" />
 
-		<!-- <rename src="${dist}/${libraryName}.zip" dest="${dist}/${libraryName}_${versionNumber}.zip" /> -->
+		<rename src="${dist}/${libraryName}.zip" dest="${dist}/${libraryName}_${versionNumber}.zip" />
 
 		<!-- organize the ${dist} folder -->
 		<mkdir dir="${dist}/web" />
@@ -171,7 +171,7 @@
 
 		<!-- finish organizating library's distribution -->
 		<mkdir dir="${dist}/web/download" />
-		<copy file="${dist}/${libraryName}.zip" todir="${dist}/web/download" />
+		<copy file="${dist}/${libraryName}_${versionNumber}.zip" todir="${dist}/web/download" />
 
 		<copy todir="${processing}/${libraryName}/reference">
 			<fileset dir="${reference}" />

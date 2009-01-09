@@ -20,7 +20,7 @@
 	<div id="container">
 	
 		<div id="header">
-			<h1>##yourLibrary##</h1>
+			<h1>##yourLibrary## v##versionNumber##</h1>
 		</div>
 		
 		<div id="menu" class="clear">
@@ -28,9 +28,9 @@
 				<li><a href="#about">About</a> \ </li>
 				<li><a href="#download">Download</a> \ </li>
 				<li><a href="#download">Installation</a> \ </li>
-				<li><a href="#examples">Examples</a> \ </li>
+				<!-- <li><a href="#examples">Examples</a> \ </li>-->
+				<li><a href="#demos">Demo</a> \ </li>				
 				<li><a href="./reference/index.html" target="_blank">Reference</a></li>
-				<!-- <li><a href="#demos">Demos</a> \ </li> -->				
 				<!-- <li><a href="#misc">Misc</a> \ </li> -->
 				<!-- <li><a href="#images">Images</a> \ </li> -->
 			</ul>
@@ -38,22 +38,111 @@
 		
 		<div id="content" class="clear">
 			
+			<div id="demos" class="clear">
+				<h2>demo</h2>
+				<table><tr>
+				<td>
+				<!--[if !IE]> -->
+					<object classid="java:HelloPeasy.class" 
+	            			type="application/x-java-applet"
+	            			archive="HelloPeasy.jar,PeasyCam.jar,core.jar"
+	            			width="200" height="200"
+	            			standby="Loading Processing software..." >
+	            			
+						<param name="archive" value="HelloPeasy.jar,PeasyCam.jar,core.jar" />
+					
+						<param name="mayscript" value="true" />
+						<param name="scriptable" value="true" />
+					
+						<param name="image" value="loading.gif" />
+						<param name="boxmessage" value="Loading Processing software..." />
+						<param name="boxbgcolor" value="#FFFFFF" />
+					
+						<param name="test_string" value="outer" />
+				<!--<![endif]-->
+					
+					<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" 
+							codebase="http://java.sun.com/update/1.5.0/jinstall-1_5_0_15-windows-i586.cab"
+							width="200" height="200"
+							standby="Loading Processing software..."  >
+							
+						<param name="code" value="HelloPeasy" />
+						<param name="archive" value="HelloPeasy.jar,PeasyCam.jar,core.jar" />
+						
+						<param name="mayscript" value="true" />
+						<param name="scriptable" value="true" />
+						
+						<param name="image" value="loading.gif" />
+						<param name="boxmessage" value="Loading Processing software..." />
+						<param name="boxbgcolor" value="#FFFFFF" />
+						
+						<param name="test_string" value="inner" />
+						
+						<p>
+							<strong>
+								This browser does not have a Java Plug-in.
+								<br />
+								<a href="http://java.sun.com/products/plugin/downloads/index.html" title="Download Java Plug-in">
+									Get the latest Java Plug-in here.
+								</a>
+							</strong>
+						</p>
+					
+					</object>
+					
+				<!--[if !IE]> -->
+					</object>
+				<!--<![endif]-->
+				<p>
+					left-drag to rotate
+					<br/>
+					right-drag up and down to zoom
+					<br/>
+					middle-drag (cmd-left-drag on mac) to pan
+					<br/>
+					double-click to reset
+				</p>
+				
+			</td>
+			<td>
+<pre>import peasy.*;
+
+PeasyCam cam;
+
+void setup() {
+  size(200,200,P3D);
+  cam = new PeasyCam(this, 100);
+}
+
+void draw() {
+  background(20);
+  fill(255,0,0);
+  box(30);
+  translate(0,0,-20);
+  fill(0,0,255);
+  box(5);
+}</pre>
+			</td>
+			</tr></table>
+			</div>
+			
+			
 			<div id="about">
-			<h2>##yourLibrary##</h2>
+			<h2>##yourLibrary## v##versionNumber##</h2>
 			<p>
 			A library by <a href="##yourLink##">##author##</a> for the programming environment <a href="http://www.processing.org" target="_blank">processing</a>. Last update, ##date##.
 			</p>
 
 <p>PeasyCam provides a dead-simple mouse-driven camera for Processing. </p>
 <h3>Example</h3>
-<pre class="prettyprint">PeasyCam camera;
+<pre>PeasyCam camera;
 
 void setup() {
     camera = new PeasyCam(this, 0, 0, 0, 50);
 }</pre>
 <p>
 	That's it. Now a mouse left-drag will rotate the camera around the subject, 
-	a right drag will zoom in and out, and a middle-drag will pan. A 
+	a right drag will zoom in and out, and a middle-drag (command-left-drag on mac) will pan. A 
 	double-click restores the camera to its original position.
 </p>
 <p>
@@ -61,6 +150,28 @@ void setup() {
 	distance from the look-at point. Rotations are around axes that 
 	pass through the looked-at point.
 </p>
+
+<p>
+	PeasyCam is impervious to gimbal lock, and has no known "singularities" or 
+	discontinuities in its behavior. It relies on the excellent 
+	<a href="http://commons.apache.org/math/">Apache Commons Math</a>
+	<a href="http://commons.apache.org/math/userguide/geometry.html">geometry package</a>
+	for its rotations.
+</p>
+
+			<div id="download">
+			<h2>Download</h2>
+			<p>
+			Download ##yourLibrary## version ##versionNumber## in 
+			<a href="./download/##yourLibrary##.zip">.zip format</a>.
+			</p>
+			<h2>Installation</h2>
+			<p>
+			Unzip and put the extracted ##yourLibrary## folder into the libraries folder of your processing sketches. Reference and examples are included in the ##yourLibrary## folder.
+			</p>
+			</div>	
+			
+
 <h3>Constructors</h3>
 <pre class="prettyprint">PeasyCam(PApplet parent, double lookAtX, double lookAtY, double lookAtZ, double distance);
 PeasyCam(PApplet parent, double distance); // look at 0,0,0
@@ -75,29 +186,9 @@ camera.rotateZ(double angle);  // rotate around the z-axis passing through the s
 camera.setDistance(double d);  // distance from looked-at point
 camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation</pre>
 
-<p>
-	PeasyCam is impervious to gimbal lock, and has no known "singularities" or 
-	discontinuities in its behavior. It relies on the excellent 
-	<a href="http://commons.apache.org/math/">Apache Commons Math</a>
-	<a href="http://commons.apache.org/math/userguide/geometry.html">geometry package</a>
-	for its rotations.
-</p>
-
 			</div>
 			
 			
-			
-			<div id="download" class="clear">
-			<h2>Download</h2>
-			<p>
-			Download ##yourLibrary## version ##versionNumber## in 
-			<a href="./download/##yourLibrary##.zip">.zip format</a>.
-			</p>
-			<h2>Installation</h2>
-			<p>
-			Unzip and put the extracted ##yourLibrary## folder into the libraries folder of your processing sketches. Reference and examples are included in the ##yourLibrary## folder.
-			</p>
-			</div>	
 			
 			
 			<div id="resources">
@@ -106,6 +197,7 @@ camera.pan(double dx, double dy);     // move the looked-at point relative to cu
 			<p><strong>Source</strong>. The source code of ##yourLibrary## is available at <a href="##source:url##">##source:host##</a>, and its repository can be browsed <a href="##source:repository##" target="_blank">here</a>.</p>			
 			</div>
 			
+			<!-- 
 			<div id="examples" class="clear">
 			<h2>Examples</h2>
 			<p>Find a list of examples in the current distribution of ##yourLibrary##, or have a look at them by following the links below.</p>
@@ -113,7 +205,7 @@ camera.pan(double dx, double dy);     // move the looked-at point relative to cu
 			##examples##
 			</ul>
 			</div>
-			
+			 -->
 			
 			<div id="info">
 			<h2>Tested</h2>
@@ -130,19 +222,6 @@ camera.pan(double dx, double dy);     // move the looked-at point relative to cu
 			</div>
 		
 			
-			<!-- use the demos section for a list of applets run in a browser. -->
-			<!--
-			<div id="demos" class="clear">
-				<h2>demos</h2>
-				<p>
-				find a list of online applet demos below.
-				
-				<ul>
-					<li><a href="./applets/demo/index.html">demo</a></li>
-				</ul>
-				</p>
-			</div>
-			-->
 			
 			<!-- use the misc section for other relevant information. Activate the link to the misc section in the menu above. -->
 			<!--
