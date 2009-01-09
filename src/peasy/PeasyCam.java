@@ -53,7 +53,7 @@ public class PeasyCam
 
 	private Constraint dragConstraint = null;
 
-	public final String VERSION = "0.1.0";
+	public final String VERSION = "0.1.1";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
