@@ -122,16 +122,14 @@ public class PeasyCam
 			}
 			else if (e.getID() == MouseEvent.MOUSE_DRAGGED)
 			{
-				float dx = p.mouseX - p.pmouseX;
-				float dy = p.mouseY - p.pmouseY;
+				double dx = p.mouseX - p.pmouseX;
+				double dy = p.mouseY - p.pmouseY;
 
 				if (e.isShiftDown())
 				{
 					if (dragConstraint == null && Math.abs(dx - dy) > 1)
-					{
 						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.X
 								: Constraint.Y;
-					}
 				}
 				else
 				{
@@ -148,27 +146,19 @@ public class PeasyCam
 			}
 		}
 
-		public void reset()
-		{
-			center = startCenter;
-			distance = startDistance;
-			rotation = new Rotation();
-			feed();
-		}
-
 		private void mouseZoom(final double delta)
 		{
 			setDistance(distance + delta * Math.sqrt(distance * .2));
 		}
 
-		private void mousePan(final float dxMouse, final float dyMouse)
+		private void mousePan(final double dxMouse, final double dyMouse)
 		{
 			final double panScale = Math.sqrt(distance * .005);
 			pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
 					dragConstraint == Constraint.X ? 0 : dyMouse * panScale);
 		}
 
-		private void mouseRotate(final float dx, final float dy)
+		private void mouseRotate(final double dx, final double dy)
 		{
 			final Vector3D u = LOOK.scalarMultiply(distance).negate();
 			final double rotationScale = Math.sqrt(distance * .05);
@@ -208,6 +198,37 @@ public class PeasyCam
 		p.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
 				(float) center.getX(), (float) center.getY(), (float) center.getZ(),
 				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
+	}
+
+	protected class Interp
+	{
+		final int start = p.millis();
+		final Rotation startRot = rotation;
+		final Rotation endRot = new Rotation();
+		final Vector3D c = center;
+		final double sd = distance;
+
+		public void draw()
+		{
+			double t = (p.millis() - start) / 150.0;
+			if (t >= 1)
+			{
+				p.unregisterDraw(this);
+				return;
+			}
+			rotation = RotationUtil.slerp(startRot, endRot, t);
+			center = new Vector3D(c.getX() * (1 - t) + startCenter.getX() * t, c.getY()
+					* (1 - t) + startCenter.getY() * t, c.getZ() * (1 - t)
+					+ startCenter.getZ() * t);
+			distance = sd * (1 - t) + startDistance * t;
+			feed();
+		}
+	}
+
+	public void reset()
+	{
+		p.registerDraw(new Interp());
+		feed();
 	}
 
 	public void pan(final double dx, final double dy)
