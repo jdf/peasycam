@@ -27,6 +27,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 
 /**
+ * 
  * @author Jonathan Feinberg
  */
 public class PeasyCam
