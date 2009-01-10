@@ -216,6 +216,9 @@ public class PeasyCam
 			double t = (p.millis() - start) / 300.0;
 			if (t >= 1)
 			{
+				rotation = endRot;
+				center = startCenter;
+				distance = startDistance;
 				p.unregisterDraw(this);
 				return;
 			}
