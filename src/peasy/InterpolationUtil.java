@@ -1,8 +1,9 @@
 package peasy;
 
 import peasy.org.apache.commons.math.geometry.Rotation;
+import peasy.org.apache.commons.math.geometry.Vector3D;
 
-public class RotationUtil
+public class InterpolationUtil
 {
 	static public Rotation slerp(final Rotation a, final Rotation b, final double t)
 	{
@@ -27,4 +28,14 @@ public class RotationUtil
 				* b.getQ3(), true);
 	}
 
+	static public double linear(final double a, final double b, final double t)
+	{
+		return a + (b - a) * t;
+	}
+
+	static public Vector3D linear(final Vector3D a, final Vector3D b, final double t)
+	{
+		return new Vector3D(linear(a.getX(), b.getX(), t), linear(a.getY(), b.getY(), t),
+				linear(a.getZ(), b.getZ(), t));
+	}
 }

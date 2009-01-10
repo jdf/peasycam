@@ -18,6 +18,9 @@
  */
 package peasy;
 
+import static peasy.InterpolationUtil.linear;
+import static peasy.InterpolationUtil.slerp;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
@@ -210,17 +213,15 @@ public class PeasyCam
 
 		public void draw()
 		{
-			double t = (p.millis() - start) / 150.0;
+			double t = (p.millis() - start) / 300.0;
 			if (t >= 1)
 			{
 				p.unregisterDraw(this);
 				return;
 			}
-			rotation = RotationUtil.slerp(startRot, endRot, t);
-			center = new Vector3D(c.getX() * (1 - t) + startCenter.getX() * t, c.getY()
-					* (1 - t) + startCenter.getY() * t, c.getZ() * (1 - t)
-					+ startCenter.getZ() * t);
-			distance = sd * (1 - t) + startDistance * t;
+			rotation = slerp(startRot, endRot, t);
+			center = linear(c, startCenter, t);
+			distance = linear(sd, startDistance, t);
 			feed();
 		}
 	}
