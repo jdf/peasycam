@@ -35,8 +35,8 @@ import processing.core.PConstants;
  */
 public class PeasyCam
 {
-	private static final Vector3D LOOK = Vector3D.minusK;
-	private static final Vector3D UP = Vector3D.minusJ;
+	private static final Vector3D LOOK = Vector3D.plusK;
+	private static final Vector3D UP = Vector3D.plusJ;
 
 	private static enum Constraint
 	{
@@ -158,7 +158,7 @@ public class PeasyCam
 		{
 			final double panScale = Math.sqrt(distance * .005);
 			pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
-					dragConstraint == Constraint.X ? 0 : dyMouse * panScale);
+					dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
 		}
 
 		private void mouseRotate(final double dx, final double dy)
@@ -169,7 +169,7 @@ public class PeasyCam
 			if (dragConstraint != Constraint.Y)
 			{
 				final Vector3D vx = u.add(new Vector3D(dx * rotationScale, 0, 0));
-				rotateY(Vector3D.angle(u, vx) * (dx < 0 ? -1 : 1));
+				rotateY(Vector3D.angle(u, vx) * (dx > 0 ? -1 : 1));
 			}
 
 			if (dragConstraint != Constraint.X)
