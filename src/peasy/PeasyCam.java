@@ -184,6 +184,7 @@ public class PeasyCam
 	public void lookAt(final double x, final double y, final double z)
 	{
 		center = new Vector3D(x, y, z);
+		feed();
 	}
 
 	public void setDistance(final double distance)
