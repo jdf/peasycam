@@ -166,18 +166,20 @@ public class PeasyCam
 			final Vector3D u = LOOK.scalarMultiply(distance).negate();
 			final double rotationScale = Math.sqrt(distance * .05);
 
-			if (dragConstraint != Constraint.Y)
-			{
-				final Vector3D vx = u.add(new Vector3D(dx * rotationScale, 0, 0));
-				rotateY(Vector3D.angle(u, vx) * (dx > 0 ? -1 : 1));
-			}
-
 			if (dragConstraint != Constraint.X)
 			{
 				final Vector3D vy = u.add(new Vector3D(0, dy * rotationScale, 0));
 				final double yAngle = Vector3D.angle(u, vy) * (dy < 0 ? -1 : 1);
 				rotateX(yAngle);
 			}
+
+			if (dragConstraint != Constraint.Y)
+			{
+				final Vector3D vx = u.add(new Vector3D(dx * rotationScale, 0, 0));
+				rotateY(Vector3D.angle(u, vx) * (dx > 0 ? -1 : 1));
+			}
+
+			feed();
 		}
 	}
 
@@ -206,7 +208,7 @@ public class PeasyCam
 
 	protected class Interp
 	{
-		final int start = p.millis();
+		final double start = p.millis();
 		final Rotation startRot = rotation;
 		final Rotation endRot = new Rotation();
 		final Vector3D c = center;
@@ -215,12 +217,13 @@ public class PeasyCam
 		public void draw()
 		{
 			double t = (p.millis() - start) / 300.0;
-			if (t >= 1)
+			if (t > .99)
 			{
 				rotation = endRot;
 				center = startCenter;
 				distance = startDistance;
 				p.unregisterDraw(this);
+				feed();
 				return;
 			}
 			rotation = slerp(startRot, endRot, t);
