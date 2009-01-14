@@ -168,15 +168,28 @@ public class PeasyCam
 
 			if (dragConstraint != Constraint.X)
 			{
-				final Vector3D vy = u.add(new Vector3D(0, dy * rotationScale, 0));
-				final double yAngle = Vector3D.angle(u, vy) * (dy < 0 ? -1 : 1);
-				rotateX(yAngle);
+				final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
+				final double adz = Math.abs(dy) * rho;
+				final double ady = Math.abs(dy) * (1 - rho);
+				final int ySign = dy < 0 ? -1 : 1;
+				final Vector3D vy = u.add(new Vector3D(0, ady * rotationScale, 0));
+				rotateX(Vector3D.angle(u, vy) * ySign);
+				final Vector3D vz = u.add(new Vector3D(0, adz * rotationScale, 0));
+				rotateZ(Vector3D.angle(u, vz) * -ySign
+						* (p.mouseX < p.width / 2 ? -1 : 1));
 			}
 
 			if (dragConstraint != Constraint.Y)
 			{
-				final Vector3D vx = u.add(new Vector3D(dx * rotationScale, 0, 0));
-				rotateY(Vector3D.angle(u, vx) * (dx > 0 ? -1 : 1));
+				final double rho = Math.abs((p.height / 2d) - p.mouseY) / (p.height / 2d);
+				final double adz = Math.abs(dx) * rho;
+				final double adx = Math.abs(dx) * (1 - rho);
+				final int xSign = dx > 0 ? -1 : 1;
+				final Vector3D vx = u.add(new Vector3D(adx * rotationScale, 0, 0));
+				rotateY(Vector3D.angle(u, vx) * xSign);
+				final Vector3D vz = u.add(new Vector3D(0, adz * rotationScale, 0));
+				rotateZ(Vector3D.angle(u, vz) * xSign
+						* (p.mouseY > p.height / 2 ? -1 : 1));
 			}
 
 			feed();
