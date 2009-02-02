@@ -18,7 +18,7 @@
 	<property name="author" value="Jonathan Feinberg" />
 	<property name="copyright" value="(c) 2008" />
 	<property name="libraryName" value="PeasyCam" />
-	<property name="versionNumber" value="0.2.2" />
+	<property name="versionNumber" value="0.2.3" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />
@@ -93,13 +93,13 @@
 			<fileset dir="src" />
 		</copy>
 		<copy todir="web" file="${realDist}/library/${jarFile}"/>
+		<copy todir="../Patchy/web" file="${realDist}/library/${jarFile}"/>
 
 		<!-- create the java reference of the library -->
 		<mkdir dir="${reference}" />
 		<javadoc bottom="processing library ${libraryName} by ${author}. ${copyright}" classpath="${libraryClasspath}/core.jar" destdir="${reference}" verbose="false" stylesheetfile="resources/stylesheet.css" doctitle="Javadocs: ${libraryName}" public="true" version="false" windowtitle="Javadocs: ${libraryName}">
 			<taglet name="ExampleTaglet" path="resources/code" />
-			<fileset dir="${src}" defaultexcludes="yes">
-				<!-- #### (9) add packages to be added to reference. #### -->
+			<fileset dir="${src}" excludes="**/*.gz">
 				<include name="**/*" />
 			</fileset>
 		</javadoc>
@@ -116,7 +116,7 @@
 		<!-- zip the distribution of the library -->
 		<zip destfile="${dist}/${libraryName}.zip" basedir="${dist}" excludes="**/_DS.Store,**/applet/**" />
 
-		<rename src="${dist}/${libraryName}.zip" dest="${dist}/${libraryName}_${versionNumber}.zip" />
+		<move file="${dist}/${libraryName}.zip" tofile="${dist}/${libraryName}_${versionNumber}.zip" />
 
 		<!-- organize the ${dist} folder -->
 		<mkdir dir="${dist}/web" />

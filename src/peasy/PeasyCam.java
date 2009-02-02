@@ -54,6 +54,10 @@ public class PeasyCam
 	private Vector3D center;
 	private Rotation rotation;
 
+	private final DampedAction rotateX;
+	private final DampedAction rotateY;
+	private final DampedAction rotateZ;
+
 	private Constraint dragConstraint = null;
 
 	public final String VERSION = "0.1.1";
@@ -72,6 +76,31 @@ public class PeasyCam
 		this.rotation = new Rotation();
 		setMouseControlled(true);
 		feed();
+
+		rotateX = new DampedAction(this) {
+			@Override
+			protected void behave(final double position)
+			{
+				rotation = rotation.applyTo(new Rotation(Vector3D.plusI, position));
+			}
+		};
+
+		rotateY = new DampedAction(this) {
+			@Override
+			protected void behave(final double position)
+			{
+				rotation = rotation.applyTo(new Rotation(Vector3D.plusJ, position));
+			}
+		};
+
+		rotateZ = new DampedAction(this) {
+			@Override
+			protected void behave(final double position)
+			{
+				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, position));
+			}
+		};
+
 	}
 
 	public void setMouseControlled(final boolean isMouseControlled)
@@ -164,7 +193,7 @@ public class PeasyCam
 		private void mouseRotate(final double dx, final double dy)
 		{
 			final Vector3D u = LOOK.scalarMultiply(distance).negate();
-			final double rotationScale = Math.sqrt(distance * .05);
+			final double rotationScale = Math.sqrt(distance * .002);
 
 			if (dragConstraint != Constraint.X)
 			{
@@ -173,9 +202,9 @@ public class PeasyCam
 				final double ady = Math.abs(dy) * (1 - rho);
 				final int ySign = dy < 0 ? -1 : 1;
 				final Vector3D vy = u.add(new Vector3D(0, ady * rotationScale, 0));
-				rotateX(Vector3D.angle(u, vy) * ySign);
+				rotateX.impulse(Vector3D.angle(u, vy) * ySign);
 				final Vector3D vz = u.add(new Vector3D(0, adz * rotationScale, 0));
-				rotateZ(Vector3D.angle(u, vz) * -ySign
+				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
 						* (p.mouseX < p.width / 2 ? -1 : 1));
 			}
 
@@ -186,13 +215,11 @@ public class PeasyCam
 				final double adx = Math.abs(dx) * (1 - rho);
 				final int xSign = dx > 0 ? -1 : 1;
 				final Vector3D vx = u.add(new Vector3D(adx * rotationScale, 0, 0));
-				rotateY(Vector3D.angle(u, vx) * xSign);
+				rotateY.impulse(Vector3D.angle(u, vx) * xSign);
 				final Vector3D vz = u.add(new Vector3D(0, adz * rotationScale, 0));
-				rotateZ(Vector3D.angle(u, vz) * xSign
+				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
 						* (p.mouseY > p.height / 2 ? -1 : 1));
 			}
-
-			feed();
 		}
 	}
 
@@ -236,12 +263,13 @@ public class PeasyCam
 				center = startCenter;
 				distance = startDistance;
 				p.unregisterDraw(this);
-				feed();
-				return;
 			}
-			rotation = slerp(startRot, endRot, t);
-			center = linear(c, startCenter, t);
-			distance = linear(sd, startDistance, t);
+			else
+			{
+				rotation = slerp(startRot, endRot, t);
+				center = linear(c, startCenter, t);
+				distance = linear(sd, startDistance, t);
+			}
 			feed();
 		}
 	}
@@ -258,9 +286,9 @@ public class PeasyCam
 		feed();
 	}
 
-	public void rotateX(final double yAngle)
+	public void rotateX(final double angle)
 	{
-		rotation = rotation.applyTo(new Rotation(Vector3D.plusI, yAngle));
+		rotation = rotation.applyTo(new Rotation(Vector3D.plusI, angle));
 		feed();
 	}
 
@@ -276,4 +304,8 @@ public class PeasyCam
 		feed();
 	}
 
+	PApplet getApplet()
+	{
+		return p;
+	}
 }

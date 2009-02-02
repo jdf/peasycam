@@ -28,8 +28,6 @@ import java.util.ResourceBundle;
 * <p>
 * Supports nesting, emulating JDK 1.4 behavior if necessary.</p>
 * <p>
-* Adapted from {@link org.apache.commons.collections.FunctorException}.</p>
-* 
 * @version $Revision: 620312 $ $Date: 2008-02-10 12:28:59 -0700 (Sun, 10 Feb 2008) $
 */
 public class MathException extends Exception
