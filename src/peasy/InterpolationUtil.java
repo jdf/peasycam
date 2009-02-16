@@ -25,10 +25,10 @@ public class InterpolationUtil
 {
 	static public Rotation slerp(final Rotation a, final Rotation b, final double t)
 	{
-		double cosTheta = a.getQ0() * b.getQ0() + a.getQ1() * b.getQ1() + a.getQ2()
+		final double cosTheta = a.getQ0() * b.getQ0() + a.getQ1() * b.getQ1() + a.getQ2()
 				* b.getQ2() + a.getQ3() * b.getQ3();
-		double theta = Math.acos(cosTheta);
-		double sinTheta = Math.sin(theta);
+		final double theta = Math.acos(cosTheta);
+		final double sinTheta = Math.sin(theta);
 
 		double w1, w2;
 		if (sinTheta > 0.001f)

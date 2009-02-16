@@ -29,14 +29,15 @@ package peasy;
 abstract public class DampedAction
 {
 	private final PeasyCam p;
-	private double velocity, dampening;
+	private double velocity;
+	final double dampening;
 
 	public DampedAction(final PeasyCam p)
 	{
 		this(p, 0.16);
 	}
 
-	public DampedAction(final PeasyCam p, double friction)
+	public DampedAction(final PeasyCam p, final double friction)
 	{
 		this.p = p;
 		this.velocity = 0;
@@ -44,7 +45,7 @@ abstract public class DampedAction
 		p.getApplet().registerDraw(this);
 	}
 
-	public void impulse(double impulse)
+	public void impulse(final double impulse)
 	{
 		velocity += impulse;
 	}
@@ -52,7 +53,9 @@ abstract public class DampedAction
 	public void draw()
 	{
 		if (velocity == 0)
+		{
 			return;
+		}
 		velocity *= dampening;
 		if (Math.abs(velocity) < .001)
 		{

@@ -50,13 +50,13 @@ public class PeasyCam
 
 	private PeasyMouseListener mouseListener = null;
 
-	private double distance;
-	private Vector3D center;
-	private Rotation rotation;
-
 	private final DampedAction rotateX;
 	private final DampedAction rotateY;
 	private final DampedAction rotateZ;
+
+	private double distance;
+	private Vector3D center;
+	private Rotation rotation;
 
 	private Constraint dragConstraint = null;
 
@@ -139,7 +139,9 @@ public class PeasyCam
 		public void keyEvent(final KeyEvent e)
 		{
 			if (e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_SHIFT)
+			{
 				dragConstraint = null;
+			}
 		}
 
 		public void mouseEvent(final MouseEvent e)
@@ -154,14 +156,16 @@ public class PeasyCam
 			}
 			else if (e.getID() == MouseEvent.MOUSE_DRAGGED)
 			{
-				double dx = p.mouseX - p.pmouseX;
-				double dy = p.mouseY - p.pmouseY;
+				final double dx = p.mouseX - p.pmouseX;
+				final double dy = p.mouseY - p.pmouseY;
 
 				if (e.isShiftDown())
 				{
 					if (dragConstraint == null && Math.abs(dx - dy) > 1)
+					{
 						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.X
 								: Constraint.Y;
+					}
 				}
 				else
 				{
@@ -170,11 +174,17 @@ public class PeasyCam
 
 				final int b = p.mouseButton;
 				if (b == PConstants.CENTER || (b == PConstants.LEFT && e.isMetaDown()))
+				{
 					mousePan(dx, dy);
+				}
 				else if (b == PConstants.LEFT)
+				{
 					mouseRotate(dx, dy);
+				}
 				else if (b == PConstants.RIGHT)
+				{
 					mouseZoom(dy);
+				}
 			}
 		}
 
@@ -233,7 +243,9 @@ public class PeasyCam
 	{
 		this.distance = distance;
 		if (this.distance < .01)
+		{
 			this.distance = .01;
+		}
 		feed();
 	}
 
@@ -256,7 +268,7 @@ public class PeasyCam
 
 		public void draw()
 		{
-			double t = (p.millis() - start) / 300.0;
+			final double t = (p.millis() - start) / 300.0;
 			if (t > .99)
 			{
 				rotation = endRot;
@@ -307,5 +319,18 @@ public class PeasyCam
 	PApplet getApplet()
 	{
 		return p;
+	}
+
+	public CameraState getState()
+	{
+		return new CameraState(rotation, center, distance);
+	}
+
+	public void setState(final CameraState state)
+	{
+		this.rotation = state.rotation;
+		this.center = state.center;
+		this.distance = state.distance;
+		feed();
 	}
 }
