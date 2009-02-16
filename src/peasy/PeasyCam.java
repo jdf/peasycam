@@ -60,7 +60,10 @@ public class PeasyCam
 
 	private Constraint dragConstraint = null;
 
-	public final String VERSION = "0.1.1";
+	private Interp currentInterpolator = null;
+	private final Object interpolatorLock = new Object();
+
+	public final String VERSION = "0.2.5";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -100,7 +103,6 @@ public class PeasyCam
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, position));
 			}
 		};
-
 	}
 
 	public void setMouseControlled(final boolean isMouseControlled)
@@ -260,36 +262,82 @@ public class PeasyCam
 
 	protected class Interp
 	{
-		final double start = p.millis();
-		final Rotation startRot = rotation;
-		final Rotation endRot = new Rotation();
-		final Vector3D c = center;
-		final double sd = distance;
+		double startTime;
+		final Rotation startRotation = rotation;
+		final Vector3D startCenter = center;
+		final double startDistance = distance;
+
+		final double timeInMillis;
+		final Rotation endRotation;
+		final Vector3D endCenter;
+		final double endDistance;
+
+		public Interp(final Rotation endRotation, final Vector3D endCenter,
+				final double endDistance, final long timeInMillis)
+		{
+			this.endRotation = endRotation;
+			this.endCenter = endCenter;
+			this.endDistance = endDistance;
+			this.timeInMillis = timeInMillis;
+		}
+
+		public void start()
+		{
+			startTime = p.millis();
+			p.registerDraw(this);
+		}
 
 		public void draw()
 		{
-			final double t = (p.millis() - start) / 300.0;
+			final double t = (p.millis() - startTime) / timeInMillis;
 			if (t > .99)
 			{
-				rotation = endRot;
-				center = startCenter;
-				distance = startDistance;
-				p.unregisterDraw(this);
+				rotation = endRotation;
+				center = endCenter;
+				distance = endDistance;
+				cancelInterpolation();
 			}
 			else
 			{
-				rotation = slerp(startRot, endRot, t);
-				center = linear(c, startCenter, t);
-				distance = linear(sd, startDistance, t);
+				rotation = slerp(startRotation, endRotation, t);
+				center = linear(startCenter, endCenter, t);
+				distance = linear(startDistance, endDistance, t);
 			}
 			feed();
 		}
 	}
 
+	protected void startInterpolation(final Interp interpolation)
+	{
+		cancelInterpolation();
+		synchronized (interpolatorLock)
+		{
+			currentInterpolator = interpolation;
+			currentInterpolator.start();
+		}
+	}
+
+	protected void cancelInterpolation()
+	{
+		synchronized (interpolatorLock)
+		{
+			if (currentInterpolator != null)
+			{
+				p.unregisterDraw(currentInterpolator);
+				currentInterpolator = null;
+			}
+		}
+	}
+
 	public void reset()
 	{
-		p.registerDraw(new Interp());
-		feed();
+		reset(300);
+	}
+
+	public void reset(final long animationTimeInMillis)
+	{
+		startInterpolation(new Interp(new Rotation(), startCenter, startDistance,
+				animationTimeInMillis));
 	}
 
 	public void pan(final double dx, final double dy)
@@ -328,9 +376,25 @@ public class PeasyCam
 
 	public void setState(final CameraState state)
 	{
-		this.rotation = state.rotation;
-		this.center = state.center;
-		this.distance = state.distance;
+		setState(state, 300);
+	}
+
+	public void setState(final CameraState state, final long animationTimeMillis)
+	{
+		rotateX.stop();
+		rotateY.stop();
+		rotateZ.stop();
+		if (animationTimeMillis > 0)
+		{
+			startInterpolation(new Interp(state.rotation, state.center, state.distance,
+					animationTimeMillis));
+		}
+		else
+		{
+			this.rotation = state.rotation;
+			this.center = state.center;
+			this.distance = state.distance;
+		}
 		feed();
 	}
 }

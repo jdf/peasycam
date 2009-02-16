@@ -68,5 +68,10 @@ abstract public class DampedAction
 		}
 	}
 
+	public void stop()
+	{
+		velocity = 0;
+	}
+
 	abstract protected void behave(final double position);
 }
