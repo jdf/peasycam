@@ -1,2 +1,47 @@
-Welcome, Mr. Bond.
+!PeasyCam provides a dead-simple mouse-driven camera for Processing. It is created and maintained by [http://mrfeinberg.com/ Jonathan Feinberg]. It is free for all uses, per the Apache 2.0 license.
 
+For a demo, see [http://mrfeinberg.com/peasycam/ the PeasyCam home page].
+
+=== Example ===
+{{{
+PeasyCam camera;
+
+void setup() {
+    // PeasyCam constructor:
+	    // PeasyCam(PApplet parent,
+		    //          double lookAtX, double lookAtY, double lookAtZ, 
+			    //          double distance);
+				    camera = new PeasyCam(this, 0, 0, 0, 50);
+					}
+					}}}
+
+					That's it. Now a mouse left-drag will rotate the camera around the subject, a right drag will zoom in and out, and a middle-drag will pan. A double-click restores the camera to its original position.
+
+					The !PeasyCam is positioned on a sphere whose radius is the given distance from the look-at point. Rotations are around axes that pass through the looked-at point.
+
+					=== Constructors ===
+					{{{
+					PeasyCam(PApplet parent, double lookAtX, double lookAtY, double lookAtZ, double distance);
+					PeasyCam(PApplet parent, double distance); // look at 0,0,0
+					}}}
+
+					=== Methods ===
+
+					{{{
+					camera.setMouseControlled(boolean isMouseControlled);
+					camera.lookAt(double x, double y, double z);
+					camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
+					camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
+					camera.rotateZ(double angle);  // rotate around the z-axis passing through the subject
+					camera.setDistance(double d);  // distance from looked-at point
+					camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation
+
+					camera.reset();
+					camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
+
+					CameraState state = camera.getState(); // get a serializable settings object for current state
+					camera.setState(CameraState state);
+					camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state
+					}}}
+
+					!PeasyCam is impervious to gimbal lock, and has no known "singularities" or discontinuities in its behavior. It relies on the excellent [http://commons.apache.org/math/ Apache Commons Math] [http://commons.apache.org/math/userguide/geometry.html geometry package] for its rotations.
