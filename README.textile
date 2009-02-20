@@ -5,6 +5,7 @@ free for all uses, per the Apache 2.0 license.
 For a demo, see "the PeasyCam home page":http://mrfeinberg.com/peasycam/.
 
 h3. Example
+
 <pre>PeasyCam camera;
 
 void setup() {
@@ -24,10 +25,12 @@ the look-at point. Rotations are around axes that pass through the looked-at
 point.
 
 h3. Constructors
+
 <pre>PeasyCam(PApplet parent, double lookAtX, double lookAtY, double lookAtZ, double distance);
 PeasyCam(PApplet parent, double distance); // look at 0,0,0</pre>
 
-h3.Methods
+h3. Methods
+
 <pre>camera.setMouseControlled(boolean isMouseControlled);
 camera.lookAt(double x, double y, double z);
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
