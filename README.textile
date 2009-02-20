@@ -1,0 +1,49 @@
+PeasyCam provides a dead-simple mouse-driven camera for Processing. It is
+created and maintained by "Jonathan Feinberg":http://mrfeinberg.com/. It is
+free for all uses, per the Apache 2.0 license.
+
+For a demo, see "the PeasyCam home page":http://mrfeinberg.com/peasycam/.
+
+h3. Example
+<pre>PeasyCam camera;
+
+void setup() {
+    // PeasyCam constructor:
+    // PeasyCam(PApplet parent,
+    //          double lookAtX, double lookAtY, double lookAtZ, 
+    //          double distance);
+    camera = new PeasyCam(this, 0, 0, 0, 50);
+}</pre>
+
+That's it. Now a mouse left-drag will rotate the camera around the subject, a
+right drag will zoom in and out, and a middle-drag will pan. A double-click
+restores the camera to its original position.
+
+The PeasyCam is positioned on a sphere whose radius is the given distance from
+the look-at point. Rotations are around axes that pass through the looked-at
+point.
+
+h3. Constructors
+<pre>PeasyCam(PApplet parent, double lookAtX, double lookAtY, double lookAtZ, double distance);
+PeasyCam(PApplet parent, double distance); // look at 0,0,0</pre>
+
+h3.Methods
+<pre>camera.setMouseControlled(boolean isMouseControlled);
+camera.lookAt(double x, double y, double z);
+camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
+camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
+camera.rotateZ(double angle);  // rotate around the z-axis passing through the subject
+camera.setDistance(double d);  // distance from looked-at point
+camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation
+
+camera.reset();
+camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
+
+CameraState state = camera.getState(); // get a serializable settings object for current state
+camera.setState(CameraState state);
+camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state</pre>
+
+PeasyCam is impervious to gimbal lock, and has no known "singularities" or
+discontinuities in its behavior. It relies on the excellent 
+"Apache Commons Math":http://commons.apache.org/math/ 
+"geometry package":http://commons.apache.org/math/userguide/geometry.html for its rotations.
