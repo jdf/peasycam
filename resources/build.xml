@@ -24,9 +24,9 @@
 	<property name="tested:platform" value="Windows" />
 	<property name="tested:processingVersion" value="1.0.1" />
 	<property name="tested:dependencies" value="" />
-	<property name="source:host" value="google code" />
-	<property name="source:url" value="http://code.google.com/p/peasycam" />
-	<property name="source:repository" value="http://code.google.com/p/peasycam/source/browse/" />
+	<property name="source:host" value="GitHub" />
+	<property name="source:url" value="http://github.com/jdf/peasycam/" />
+	<property name="source:repository" value="http://github.com/jdf/peasycam/" />
 
 
 	<!-- no changes or adjustments required below -->
