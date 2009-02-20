@@ -163,6 +163,13 @@ void setup() {
 	for its rotations.
 </p>
 
+<h2>Thanks</h2>
+<p>Useful bug reports and feature suggestions were provided by:</p>
+<ul>
+<li><a href="http://ooish.com/">Oori Shalev</a></li>
+</ul>
+<p>Please let me know if I've forgotten to acknowledge you.</p>
+
 			<div id="download">
 			<h2>Download</h2>
 			<p>
@@ -188,8 +195,14 @@ camera.rotateX(double angle);  // rotate around the x-axis passing through the s
 camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
 camera.rotateZ(double angle);  // rotate around the z-axis passing through the subject
 camera.setDistance(double d);  // distance from looked-at point
-camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation</pre>
+camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation
 
+camera.reset();
+camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
+
+CameraState state = camera.getState(); // get a serializable settings object for current state
+camera.setState(CameraState state);
+camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state</pre>
 			</div>
 			
 			

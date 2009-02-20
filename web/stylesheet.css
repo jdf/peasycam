@@ -16,8 +16,6 @@ body {
 	line-height	: normal;
 }
 
-
-
 #container {
 	margin-left:64px;
 	background-color:#fff;
@@ -63,12 +61,15 @@ body {
 
 
 ul {
-	list-style:none;
+	list-style:disc;
 	padding:0;
-	margin:0;
+	margin: 0 0 1em 1em;
 }
 
-
+#menu ul {
+	list-style:none;
+	margin: 0;
+}
 #menu ul li, #subMenu ul li {
 	float:left;
 	padding-right:6px; 
@@ -98,7 +99,7 @@ h2, h3, h4, h5, th {
 p { 
 	font-size:1em;
 	width:90%;
-	margin-bottom:32px;
+	margin-bottom:1em;
 }
 
 
