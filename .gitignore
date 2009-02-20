@@ -1,3 +1,4 @@
 PeasyCam.jar
 distribution
-
+bin
+examples/*/applet
