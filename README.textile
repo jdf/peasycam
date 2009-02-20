@@ -2,7 +2,8 @@ PeasyCam provides a dead-simple mouse-driven camera for Processing. It is
 created and maintained by "Jonathan Feinberg":http://mrfeinberg.com/. It is
 free for all uses, per the Apache 2.0 license.
 
-For a demo, see "the PeasyCam home page":http://mrfeinberg.com/peasycam/.
+To download the distribution, and to see a demo, go to 
+"the PeasyCam home page":http://mrfeinberg.com/peasycam/.
 
 h3. Example
 
