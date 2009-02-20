@@ -56,15 +56,12 @@ abstract public class DampedAction
 		{
 			return;
 		}
+		behave(velocity);
+		p.feed();
 		velocity *= dampening;
 		if (Math.abs(velocity) < .001)
 		{
 			velocity = 0;
-		}
-		else
-		{
-			behave(velocity);
-			p.feed();
 		}
 	}
 
@@ -73,5 +70,5 @@ abstract public class DampedAction
 		velocity = 0;
 	}
 
-	abstract protected void behave(final double position);
+	abstract protected void behave(final double velocity);
 }

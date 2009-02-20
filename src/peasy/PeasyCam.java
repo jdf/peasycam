@@ -50,9 +50,9 @@ public class PeasyCam
 
 	private PeasyMouseListener mouseListener = null;
 
-	private final DampedAction rotateX;
-	private final DampedAction rotateY;
-	private final DampedAction rotateZ;
+	private final DampedAction rotateX, rotateY, rotateZ;
+	private final DampedAction panX, panY;
+	private final DampedAction zoom;
 
 	private double distance;
 	private Vector3D center;
@@ -82,25 +82,49 @@ public class PeasyCam
 
 		rotateX = new DampedAction(this) {
 			@Override
-			protected void behave(final double position)
+			protected void behave(final double velocity)
 			{
-				rotation = rotation.applyTo(new Rotation(Vector3D.plusI, position));
+				rotation = rotation.applyTo(new Rotation(Vector3D.plusI, velocity));
 			}
 		};
 
 		rotateY = new DampedAction(this) {
 			@Override
-			protected void behave(final double position)
+			protected void behave(final double velocity)
 			{
-				rotation = rotation.applyTo(new Rotation(Vector3D.plusJ, position));
+				rotation = rotation.applyTo(new Rotation(Vector3D.plusJ, velocity));
 			}
 		};
 
 		rotateZ = new DampedAction(this) {
 			@Override
-			protected void behave(final double position)
+			protected void behave(final double velocity)
 			{
-				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, position));
+				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, velocity));
+			}
+		};
+
+		panX = new DampedAction(this, .25) {
+			@Override
+			protected void behave(final double velocity)
+			{
+				center = center.add(rotation.applyTo(new Vector3D(velocity, 0, 0)));
+			}
+		};
+
+		panY = new DampedAction(this, .25) {
+			@Override
+			protected void behave(final double velocity)
+			{
+				center = center.add(rotation.applyTo(new Vector3D(0, velocity, 0)));
+			}
+		};
+
+		zoom = new DampedAction(this, .25) {
+			@Override
+			protected void behave(final double velocity)
+			{
+				setDistance(PeasyCam.this.distance + velocity);
 			}
 		};
 	}
@@ -192,20 +216,20 @@ public class PeasyCam
 
 		private void mouseZoom(final double delta)
 		{
-			setDistance(distance + delta * Math.sqrt(distance * .2));
+			final double zoomScale = distance * .002;
+			zoom.impulse(delta * zoomScale);
 		}
 
 		private void mousePan(final double dxMouse, final double dyMouse)
 		{
-			final double panScale = Math.sqrt(distance * .005);
-			pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
-					dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
+			final double panScale = distance * .0005;
+			panX.impulse(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale);
+			panY.impulse(dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
 		}
 
 		private void mouseRotate(final double dx, final double dy)
 		{
-			final Vector3D u = LOOK.scalarMultiply(distance).negate();
-			final double rotationScale = Math.sqrt(distance * .002);
+			final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
 
 			if (dragConstraint != Constraint.X)
 			{
@@ -213,22 +237,23 @@ public class PeasyCam
 				final double adz = Math.abs(dy) * rho;
 				final double ady = Math.abs(dy) * (1 - rho);
 				final int ySign = dy < 0 ? -1 : 1;
-				final Vector3D vy = u.add(new Vector3D(0, ady * rotationScale, 0));
+				final Vector3D vy = u.add(new Vector3D(0, ady, 0));
 				rotateX.impulse(Vector3D.angle(u, vy) * ySign);
-				final Vector3D vz = u.add(new Vector3D(0, adz * rotationScale, 0));
+				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
 						* (p.mouseX < p.width / 2 ? -1 : 1));
 			}
 
 			if (dragConstraint != Constraint.Y)
 			{
-				final double rho = Math.abs((p.height / 2d) - p.mouseY) / (p.height / 2d);
-				final double adz = Math.abs(dx) * rho;
-				final double adx = Math.abs(dx) * (1 - rho);
+				final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
+						/ (p.height / 2d);
 				final int xSign = dx > 0 ? -1 : 1;
-				final Vector3D vx = u.add(new Vector3D(adx * rotationScale, 0, 0));
+				final double adz = Math.abs(dx) * eccentricity;
+				final double adx = Math.abs(dx) * (1 - eccentricity);
+				final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
 				rotateY.impulse(Vector3D.angle(u, vx) * xSign);
-				final Vector3D vz = u.add(new Vector3D(0, adz * rotationScale, 0));
+				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
 						* (p.mouseY > p.height / 2 ? -1 : 1));
 			}
@@ -244,9 +269,9 @@ public class PeasyCam
 	public void setDistance(final double distance)
 	{
 		this.distance = distance;
-		if (this.distance < .01)
+		if (this.distance < 1)
 		{
-			this.distance = .01;
+			this.distance = 1;
 		}
 		feed();
 	}
@@ -384,6 +409,8 @@ public class PeasyCam
 		rotateX.stop();
 		rotateY.stop();
 		rotateZ.stop();
+		panX.stop();
+		panY.stop();
 		if (animationTimeMillis > 0)
 		{
 			startInterpolation(new Interp(state.rotation, state.center, state.distance,
