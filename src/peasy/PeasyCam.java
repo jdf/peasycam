@@ -51,8 +51,6 @@ public class PeasyCam
 	private PeasyMouseListener mouseListener = null;
 
 	private final DampedAction rotateX, rotateY, rotateZ;
-	private final DampedAction panX, panY;
-	private final DampedAction zoom;
 
 	private double distance;
 	private Vector3D center;
@@ -104,29 +102,6 @@ public class PeasyCam
 			}
 		};
 
-		panX = new DampedAction(this, .25) {
-			@Override
-			protected void behave(final double velocity)
-			{
-				center = center.add(rotation.applyTo(new Vector3D(velocity, 0, 0)));
-			}
-		};
-
-		panY = new DampedAction(this, .25) {
-			@Override
-			protected void behave(final double velocity)
-			{
-				center = center.add(rotation.applyTo(new Vector3D(0, velocity, 0)));
-			}
-		};
-
-		zoom = new DampedAction(this, .25) {
-			@Override
-			protected void behave(final double velocity)
-			{
-				setDistance(PeasyCam.this.distance + velocity);
-			}
-		};
 	}
 
 	public void setMouseControlled(final boolean isMouseControlled)
@@ -216,15 +191,14 @@ public class PeasyCam
 
 		private void mouseZoom(final double delta)
 		{
-			final double zoomScale = distance * .002;
-			zoom.impulse(delta * zoomScale);
+			setDistance(distance + delta * Math.sqrt(distance * .2));
 		}
 
 		private void mousePan(final double dxMouse, final double dyMouse)
 		{
-			final double panScale = distance * .0005;
-			panX.impulse(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale);
-			panY.impulse(dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
+			final double panScale = Math.sqrt(distance * .005);
+			pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
+					dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
 		}
 
 		private void mouseRotate(final double dx, final double dy)
@@ -409,8 +383,6 @@ public class PeasyCam
 		rotateX.stop();
 		rotateY.stop();
 		rotateZ.stop();
-		panX.stop();
-		panY.stop();
 		if (animationTimeMillis > 0)
 		{
 			startInterpolation(new Interp(state.rotation, state.center, state.distance,
