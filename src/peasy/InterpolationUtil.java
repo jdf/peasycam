@@ -46,6 +46,19 @@ public class InterpolationUtil
 				* b.getQ3(), true);
 	}
 
+	static public double smooth(final double a, final double b, final double t)
+	{
+		final double smooth = (t * t * (3 - 2 * t));
+		return (b * smooth) + (a * (1 - smooth));
+
+	}
+
+	static public Vector3D smooth(final Vector3D a, final Vector3D b, final double t)
+	{
+		return new Vector3D(smooth(a.getX(), b.getX(), t), smooth(a.getY(), b.getY(), t),
+				smooth(a.getZ(), b.getZ(), t));
+	}
+
 	static public double linear(final double a, final double b, final double t)
 	{
 		return a + (b - a) * t;

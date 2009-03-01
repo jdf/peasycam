@@ -18,9 +18,6 @@
  */
 package peasy;
 
-import static peasy.InterpolationUtil.linear;
-import static peasy.InterpolationUtil.slerp;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
@@ -298,9 +295,9 @@ public class PeasyCam
 			}
 			else
 			{
-				rotation = slerp(startRotation, endRotation, t);
-				center = linear(startCenter, endCenter, t);
-				distance = linear(startDistance, endDistance, t);
+				rotation = InterpolationUtil.slerp(startRotation, endRotation, t);
+				center = InterpolationUtil.smooth(startCenter, endCenter, t);
+				distance = InterpolationUtil.smooth(startDistance, endDistance, t);
 			}
 			feed();
 		}
