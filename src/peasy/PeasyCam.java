@@ -45,6 +45,10 @@ public class PeasyCam
 	private final double startDistance;
 	private final Vector3D startCenter;
 
+	private boolean resetOnDoubleClick = false;
+	private double minimumDistance = 1;
+	private double maximumDistance = Double.MAX_VALUE;
+
 	private PeasyMouseListener mouseListener = null;
 
 	private final DampedAction rotateX, rotateY, rotateZ;
@@ -144,7 +148,8 @@ public class PeasyCam
 
 		public void mouseEvent(final MouseEvent e)
 		{
-			if (e.getID() == MouseEvent.MOUSE_CLICKED && e.getClickCount() == 2)
+			if (resetOnDoubleClick && e.getID() == MouseEvent.MOUSE_CLICKED
+					&& e.getClickCount() == 2)
 			{
 				reset();
 			}
@@ -233,17 +238,19 @@ public class PeasyCam
 
 	public void lookAt(final double x, final double y, final double z)
 	{
-		center = new Vector3D(x, y, z);
-		feed();
+		lookAt(x, y, z, 300);
+	}
+
+	public void lookAt(final double x, final double y, final double z,
+			final long animationTimeMillis)
+	{
+		startInterpolation(new Interp(rotation, new Vector3D(x, y, z), distance,
+				animationTimeMillis));
 	}
 
 	public void setDistance(final double distance)
 	{
-		this.distance = distance;
-		if (this.distance < 1)
-		{
-			this.distance = 1;
-		}
+		this.distance = Math.min(maximumDistance, Math.max(minimumDistance, distance));
 		feed();
 	}
 
@@ -368,6 +375,23 @@ public class PeasyCam
 	public CameraState getState()
 	{
 		return new CameraState(rotation, center, distance);
+	}
+
+	public void setMinimumDistance(final double minimumDistance)
+	{
+		this.minimumDistance = minimumDistance;
+		setDistance(distance);
+	}
+
+	public void setMaximumDistance(final double maximumDistance)
+	{
+		this.maximumDistance = maximumDistance;
+		setDistance(distance);
+	}
+
+	public void setResetOnDoubleClick(final boolean resetOnDoubleClick)
+	{
+		this.resetOnDoubleClick = true;
 	}
 
 	public void setState(final CameraState state)

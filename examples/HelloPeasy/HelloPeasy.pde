@@ -5,6 +5,9 @@ PeasyCam cam;
 void setup() {
   size(200,200,P3D);
   cam = new PeasyCam(this, 100);
+  cam.setMinimumDistance(80);
+  cam.setMaximumDistance(300);
+  cam.setResetOnDoubleClick(true);
 }
 void draw() {
   rotateX(-.5);
