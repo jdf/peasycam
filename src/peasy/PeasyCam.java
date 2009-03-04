@@ -237,14 +237,26 @@ public class PeasyCam
 
 	public void lookAt(final double x, final double y, final double z)
 	{
-		lookAt(x, y, z, 300);
+		lookAt(x, y, z, distance);
+	}
+
+	public void lookAt(final double x, final double y, final double z,
+			final double distance)
+	{
+		lookAt(x, y, z, distance, 300);
 	}
 
 	public void lookAt(final double x, final double y, final double z,
 			final long animationTimeMillis)
 	{
-		startInterpolation(new Interp(rotation, new Vector3D(x, y, z), distance,
-				animationTimeMillis));
+		lookAt(x, y, z, distance, animationTimeMillis);
+	}
+
+	public void lookAt(final double x, final double y, final double z,
+			final double distance, final long animationTimeMillis)
+	{
+		setState(new CameraState(rotation, new Vector3D(x, y, z), distance),
+				animationTimeMillis);
 	}
 
 	public void setDistance(final double distance)
@@ -390,7 +402,7 @@ public class PeasyCam
 
 	public void setResetOnDoubleClick(final boolean resetOnDoubleClick)
 	{
-		this.resetOnDoubleClick = true;
+		this.resetOnDoubleClick = resetOnDoubleClick;
 	}
 
 	public void setState(final CameraState state)
