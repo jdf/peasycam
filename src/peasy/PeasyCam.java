@@ -45,7 +45,7 @@ public class PeasyCam
 	private final double startDistance;
 	private final Vector3D startCenter;
 
-	private boolean resetOnDoubleClick = false;
+	private boolean resetOnDoubleClick = true;
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
 
@@ -62,7 +62,7 @@ public class PeasyCam
 	private Interp currentInterpolator = null;
 	private final Object interpolatorLock = new Object();
 
-	public final String VERSION = "0.2.5";
+	public final String VERSION = "0.4.1";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -102,7 +102,6 @@ public class PeasyCam
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, velocity));
 			}
 		};
-
 	}
 
 	public void setMouseControlled(final boolean isMouseControlled)
