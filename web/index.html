@@ -191,13 +191,20 @@ PeasyCam(PApplet parent, double distance); // look at 0,0,0
 </pre>
 
 <h3>Methods</h3>
-<pre class="prettyprint">camera.setMouseControlled(boolean isMouseControlled);
+<pre class="prettyprint">camera.setMouseControlled(boolean isMouseControlled);  // default true
+camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
+
 camera.lookAt(double x, double y, double z);
+camera.lookAt(double x, double y, double z, double animationTimeInMillis);
+
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
 camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
 camera.rotateZ(double angle);  // rotate around the z-axis passing through the subject
 camera.setDistance(double d);  // distance from looked-at point
 camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation
+
+camera.setMinimumDistance(double minimumDistance);
+camera.setMaximumDistance(double maximumDistance);  // clamp zooming
 
 camera.reset();
 camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
