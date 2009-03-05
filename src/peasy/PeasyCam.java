@@ -59,8 +59,9 @@ public class PeasyCam
 
 	private Constraint dragConstraint = null;
 
-	private Interp currentInterpolator = null;
-	private final Object interpolatorLock = new Object();
+	private final InterpolationManager rotationInterps = new InterpolationManager();
+	private final InterpolationManager centerInterps = new InterpolationManager();
+	private final InterpolationManager distanceInterps = new InterpolationManager();
 
 	public final String VERSION = "0.4.1";
 
@@ -192,7 +193,7 @@ public class PeasyCam
 
 		private void mouseZoom(final double delta)
 		{
-			setDistance(distance + delta * Math.sqrt(distance * .2));
+			safeSetDistance(distance + delta * Math.sqrt(distance * .2));
 		}
 
 		private void mousePan(final double dxMouse, final double dyMouse)
@@ -235,15 +236,27 @@ public class PeasyCam
 		}
 	}
 
+	public void setDistance(final double newDistance)
+	{
+		setDistance(newDistance, 300);
+	}
+
+	public void setDistance(final double newDistance, final long animationTimeMillis)
+	{
+		distanceInterps.startInterpolation(new DistanceInterp(newDistance,
+				animationTimeMillis));
+	}
+
 	public void lookAt(final double x, final double y, final double z)
 	{
-		lookAt(x, y, z, distance);
+		centerInterps.startInterpolation(new CenterInterp(new Vector3D(x, y, z), 300));
 	}
 
 	public void lookAt(final double x, final double y, final double z,
 			final double distance)
 	{
-		lookAt(x, y, z, distance, 300);
+		lookAt(x, y, z);
+		setDistance(distance);
 	}
 
 	public void lookAt(final double x, final double y, final double z,
@@ -259,7 +272,7 @@ public class PeasyCam
 				animationTimeMillis);
 	}
 
-	public void setDistance(final double distance)
+	private void safeSetDistance(final double distance)
 	{
 		this.distance = Math.min(maximumDistance, Math.max(minimumDistance, distance));
 		feed();
@@ -274,75 +287,6 @@ public class PeasyCam
 				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
 	}
 
-	protected class Interp
-	{
-		double startTime;
-		final Rotation startRotation = rotation;
-		final Vector3D startCenter = center;
-		final double startDistance = distance;
-
-		final double timeInMillis;
-		final Rotation endRotation;
-		final Vector3D endCenter;
-		final double endDistance;
-
-		public Interp(final Rotation endRotation, final Vector3D endCenter,
-				final double endDistance, final long timeInMillis)
-		{
-			this.endRotation = endRotation;
-			this.endCenter = endCenter;
-			this.endDistance = endDistance;
-			this.timeInMillis = timeInMillis;
-		}
-
-		public void start()
-		{
-			startTime = p.millis();
-			p.registerDraw(this);
-		}
-
-		public void draw()
-		{
-			final double t = (p.millis() - startTime) / timeInMillis;
-			if (t > .99)
-			{
-				rotation = endRotation;
-				center = endCenter;
-				distance = endDistance;
-				cancelInterpolation();
-			}
-			else
-			{
-				rotation = InterpolationUtil.slerp(startRotation, endRotation, t);
-				center = InterpolationUtil.smooth(startCenter, endCenter, t);
-				distance = InterpolationUtil.smooth(startDistance, endDistance, t);
-			}
-			feed();
-		}
-	}
-
-	protected void startInterpolation(final Interp interpolation)
-	{
-		cancelInterpolation();
-		synchronized (interpolatorLock)
-		{
-			currentInterpolator = interpolation;
-			currentInterpolator.start();
-		}
-	}
-
-	protected void cancelInterpolation()
-	{
-		synchronized (interpolatorLock)
-		{
-			if (currentInterpolator != null)
-			{
-				p.unregisterDraw(currentInterpolator);
-				currentInterpolator = null;
-			}
-		}
-	}
-
 	public void reset()
 	{
 		reset(300);
@@ -350,8 +294,8 @@ public class PeasyCam
 
 	public void reset(final long animationTimeInMillis)
 	{
-		startInterpolation(new Interp(new Rotation(), startCenter, startDistance,
-				animationTimeInMillis));
+		setState(new CameraState(new Rotation(), startCenter, startDistance),
+				animationTimeInMillis);
 	}
 
 	public void pan(final double dx, final double dy)
@@ -391,13 +335,13 @@ public class PeasyCam
 	public void setMinimumDistance(final double minimumDistance)
 	{
 		this.minimumDistance = minimumDistance;
-		setDistance(distance);
+		safeSetDistance(distance);
 	}
 
 	public void setMaximumDistance(final double maximumDistance)
 	{
 		this.maximumDistance = maximumDistance;
-		setDistance(distance);
+		safeSetDistance(distance);
 	}
 
 	public void setResetOnDoubleClick(final boolean resetOnDoubleClick)
@@ -412,12 +356,13 @@ public class PeasyCam
 
 	public void setState(final CameraState state, final long animationTimeMillis)
 	{
-		rotateX.stop();
-		rotateY.stop();
-		rotateZ.stop();
 		if (animationTimeMillis > 0)
 		{
-			startInterpolation(new Interp(state.rotation, state.center, state.distance,
+			rotationInterps.startInterpolation(new RotationInterp(state.rotation,
+					animationTimeMillis));
+			centerInterps.startInterpolation(new CenterInterp(state.center,
+					animationTimeMillis));
+			distanceInterps.startInterpolation(new DistanceInterp(state.distance,
 					animationTimeMillis));
 		}
 		else
@@ -427,5 +372,129 @@ public class PeasyCam
 			this.distance = state.distance;
 		}
 		feed();
+	}
+
+	abstract public class AbstractInterp
+	{
+		double startTime;
+		final double timeInMillis;
+
+		protected AbstractInterp(final long timeInMillis)
+		{
+			this.timeInMillis = timeInMillis;
+		}
+
+		void start()
+		{
+			startTime = p.millis();
+			p.registerDraw(this);
+		}
+
+		void cancel()
+		{
+			p.unregisterDraw(this);
+		}
+
+		public void draw()
+		{
+			final double t = (p.millis() - startTime) / timeInMillis;
+			if (t > .99)
+			{
+				cancel();
+				setEndState();
+			}
+			else
+			{
+				interp(t);
+			}
+			feed();
+		}
+
+		protected abstract void interp(double t);
+
+		protected abstract void setEndState();
+	}
+
+	class DistanceInterp extends AbstractInterp
+	{
+		private final double startDistance = distance;
+		private final double endDistance;
+
+		public DistanceInterp(final double endDistance, final long timeInMillis)
+		{
+			super(timeInMillis);
+			this.endDistance = Math.min(maximumDistance, Math.max(minimumDistance,
+					endDistance));
+		}
+
+		@Override
+		protected void interp(final double t)
+		{
+			distance = InterpolationUtil.smooth(startDistance, endDistance, t);
+		}
+
+		@Override
+		protected void setEndState()
+		{
+			distance = endDistance;
+		}
+	}
+
+	class CenterInterp extends AbstractInterp
+	{
+		private final Vector3D startCenter = center;
+		private final Vector3D endCenter;
+
+		public CenterInterp(final Vector3D endCenter, final long timeInMillis)
+		{
+			super(timeInMillis);
+			this.endCenter = endCenter;
+		}
+
+		@Override
+		protected void interp(final double t)
+		{
+			center = InterpolationUtil.smooth(startCenter, endCenter, t);
+		}
+
+		@Override
+		protected void setEndState()
+		{
+			center = endCenter;
+		}
+	}
+
+	class RotationInterp extends AbstractInterp
+	{
+		final Rotation startRotation = rotation;
+		final Rotation endRotation;
+
+		public RotationInterp(final Rotation endRotation, final long timeInMillis)
+		{
+			super(timeInMillis);
+			this.endRotation = endRotation;
+		}
+
+		@Override
+		void start()
+		{
+			rotateX.stop();
+			rotateY.stop();
+			rotateZ.stop();
+			super.start();
+		}
+
+		@Override
+		protected void interp(final double t)
+		{
+			rotation = InterpolationUtil.slerp(startRotation, endRotation, t);
+		}
+
+		@Override
+		protected void setEndState()
+		{
+			rotation = endRotation;
+		}
+
 	}
 }
