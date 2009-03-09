@@ -213,7 +213,9 @@ camera.reset(long animationTimeInMillis);  // reset camera to its starting setti
 
 CameraState state = camera.getState(); // get a serializable settings object for current state
 camera.setState(CameraState state);
-camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state</pre>
+camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state
+
+float[] rotations = camera.getRotations(); // x, y, and z rotations required to face camera in model space</pre>
 			</div>
 			
 			
