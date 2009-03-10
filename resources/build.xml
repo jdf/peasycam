@@ -18,7 +18,7 @@
 	<property name="author" value="Jonathan Feinberg" />
 	<property name="copyright" value="(c) 2008" />
 	<property name="libraryName" value="PeasyCam" />
-	<property name="versionNumber" value="0.5.0" />
+	<property name="versionNumber" value="0.5.1" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />

@@ -169,6 +169,7 @@ void setup() {
 <p>Useful bug reports and feature suggestions were provided by:</p>
 <ul>
 <li><a href="http://ooish.com/">Oori Shalev</a></li>
+<li>Jeffrey Gentes</li>
 </ul>
 <p>Please let me know if I've forgotten to acknowledge you.</p>
 
@@ -204,6 +205,9 @@ camera.rotateY(double angle);  // rotate around the y-axis passing through the s
 camera.rotateZ(double angle);  // rotate around the z-axis passing through the subject
 camera.setDistance(double d);  // distance from looked-at point
 camera.pan(double dx, double dy);     // move the looked-at point relative to current orientation
+
+double camera.getDistance();  // current distance
+float[] camera.getLookAt();  // float[] { x, y, z }, looked-at point
 
 camera.setMinimumDistance(double minimumDistance);
 camera.setMaximumDistance(double maximumDistance);  // clamp zooming

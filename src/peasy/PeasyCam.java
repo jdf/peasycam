@@ -238,6 +238,11 @@ public class PeasyCam
 		}
 	}
 
+	public double getDistance()
+	{
+		return distance;
+	}
+
 	public void setDistance(final double newDistance)
 	{
 		setDistance(newDistance, 300);
@@ -247,6 +252,12 @@ public class PeasyCam
 	{
 		distanceInterps.startInterpolation(new DistanceInterp(newDistance,
 				animationTimeMillis));
+	}
+
+	public float[] getLookAt()
+	{
+		return new float[] { (float) center.getX(), (float) center.getY(),
+				(float) center.getZ() };
 	}
 
 	public void lookAt(final double x, final double y, final double z)
