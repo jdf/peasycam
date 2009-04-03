@@ -18,7 +18,7 @@
 	<property name="author" value="Jonathan Feinberg" />
 	<property name="copyright" value="(c) 2008" />
 	<property name="libraryName" value="PeasyCam" />
-	<property name="versionNumber" value="0.5.1" />
+	<property name="versionNumber" value="0.5.2" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />
@@ -84,6 +84,12 @@
 	
 	<!-- compile the library -->
 	<target name="compile" depends="init" description="compile the source">
+		<echo message="Bump version number in applet"/>
+		<replaceregexp 
+			match='VERSION = "[^"]+"' 
+			replace='VERSION = "${versionNumber}"' 
+			file="${src}/peasy/PeasyCam.java"/>
+
 		<javac destdir="${bin}" source="${javaVersion}">
 			<classpath>
 				<path refid="library-classpath" />

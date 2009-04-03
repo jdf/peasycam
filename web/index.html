@@ -219,7 +219,8 @@ CameraState state = camera.getState(); // get a serializable settings object for
 camera.setState(CameraState state);
 camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state
 
-float[] rotations = camera.getRotations(); // x, y, and z rotations required to face camera in model space</pre>
+float[] rotations = camera.getRotations(); // x, y, and z rotations required to face camera in model space
+camera.setRotations(double pitch, double yaw, double roll); // rotations are applied in that order</pre>
 			</div>
 			
 			

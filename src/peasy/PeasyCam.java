@@ -65,7 +65,7 @@ public class PeasyCam
 	private final InterpolationManager centerInterps = new InterpolationManager();
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
-	public final String VERSION = "0.4.1";
+	public final String VERSION = "0.5.2";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -105,6 +105,7 @@ public class PeasyCam
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, velocity));
 			}
 		};
+		System.err.println("PeasyCam v" + VERSION);
 	}
 
 	public void setMouseControlled(final boolean isMouseControlled)
@@ -384,6 +385,13 @@ public class PeasyCam
 			this.center = state.center;
 			this.distance = state.distance;
 		}
+		feed();
+	}
+
+	public void setRotations(final double pitch, final double yaw, final double roll)
+	{
+		rotationInterps.cancelInterpolation();
+		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
 		feed();
 	}
 
