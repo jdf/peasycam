@@ -65,7 +65,7 @@ public class PeasyCam
 	private final InterpolationManager centerInterps = new InterpolationManager();
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
-	public final String VERSION = "0.5.2";
+	public final String VERSION = "0.5.3";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -299,6 +299,16 @@ public class PeasyCam
 		p.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
 				(float) center.getX(), (float) center.getY(), (float) center.getZ(),
 				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
+	}
+
+	/**
+	 * Where is the PeasyCam in world space?
+	 * @return float[]{x,y,z}
+	 */
+	public float[] getPosition()
+	{
+		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
+		return new float[] { (float) pos.getX(), (float) pos.getY(), (float) pos.getZ() };
 	}
 
 	public void reset()
