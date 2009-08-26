@@ -57,3 +57,8 @@ PeasyCam is impervious to gimbal lock, and has no known "singularities" or
 discontinuities in its behavior. It relies on the excellent 
 "Apache Commons Math":http://commons.apache.org/math/ 
 "geometry package":http://commons.apache.org/math/userguide/geometry.html for its rotations.
+
+h3. Contributors
+
+Thanks: "Oori Shalev":http://ooish.com/, Jeffrey Gentes, and A.W. Martin for
+bug reports and feature suggestions.
