@@ -60,5 +60,5 @@ discontinuities in its behavior. It relies on the excellent
 
 h3. Contributors
 
-Thanks: "Oori Shalev":http://ooish.com/, Jeffrey Gentes, and A.W. Martin for
+Thanks: "Oori Shalev":http://ooish.com/, "Jeffrey Gentes":http://imaginationfeed.com, and A.W. Martin for
 bug reports and feature suggestions.
