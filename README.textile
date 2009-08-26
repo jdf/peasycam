@@ -45,7 +45,13 @@ camera.reset(long animationTimeInMillis);  // reset camera to its starting setti
 
 CameraState state = camera.getState(); // get a serializable settings object for current state
 camera.setState(CameraState state);
-camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state</pre>
+camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state
+
+// Utility methods to permit the use of a Heads-Up Display
+// Thanks, A.W. Martin
+camera.beginHUD();
+// now draw things that you want relative to the camera's position and orientation
+camera.endHUD(); // always!</pre>
 
 PeasyCam is impervious to gimbal lock, and has no known "singularities" or
 discontinuities in its behavior. It relies on the excellent 

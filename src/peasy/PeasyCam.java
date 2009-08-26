@@ -65,7 +65,7 @@ public class PeasyCam
 	private final InterpolationManager centerInterps = new InterpolationManager();
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
-	public final String VERSION = "0.5.3";
+	public final String VERSION = "0.6.0";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -105,6 +105,7 @@ public class PeasyCam
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, velocity));
 			}
 		};
+
 		System.err.println("PeasyCam v" + VERSION);
 	}
 
@@ -144,22 +145,16 @@ public class PeasyCam
 		public void keyEvent(final KeyEvent e)
 		{
 			if (e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_SHIFT)
-			{
 				dragConstraint = null;
-			}
 		}
 
 		public void mouseEvent(final MouseEvent e)
 		{
 			if (resetOnDoubleClick && e.getID() == MouseEvent.MOUSE_CLICKED
 					&& e.getClickCount() == 2)
-			{
 				reset();
-			}
 			else if (e.getID() == MouseEvent.MOUSE_RELEASED)
-			{
 				dragConstraint = null;
-			}
 			else if (e.getID() == MouseEvent.MOUSE_DRAGGED)
 			{
 				final double dx = p.mouseX - p.pmouseX;
@@ -168,29 +163,19 @@ public class PeasyCam
 				if (e.isShiftDown())
 				{
 					if (dragConstraint == null && Math.abs(dx - dy) > 1)
-					{
 						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.X
 								: Constraint.Y;
-					}
 				}
 				else
-				{
 					dragConstraint = null;
-				}
 
 				final int b = p.mouseButton;
 				if (b == PConstants.CENTER || (b == PConstants.LEFT && e.isMetaDown()))
-				{
 					mousePan(dx, dy);
-				}
 				else if (b == PConstants.LEFT)
-				{
 					mouseRotate(dx, dy);
-				}
 				else if (b == PConstants.RIGHT)
-				{
 					mouseZoom(dy);
-				}
 			}
 		}
 
@@ -446,6 +431,28 @@ public class PeasyCam
 		return new float[] { 0, 0, 0 };
 	}
 
+	/**
+	 * Thanks to A.W. Martin for the code to do HUD
+	 */
+	public void beginHUD()
+	{
+		p.pushMatrix();
+		p.hint(PApplet.DISABLE_DEPTH_TEST);
+
+		// Load the identity matrix.
+		p.resetMatrix();
+		// Apply the original Processing transformation matrix.
+		p.applyMatrix(1, 0, 0, -p.width / 2f, 0, 1, 0, -p.height / 2f, 0, 0, 1,
+				-346.4102f, 0, 0, 0, 1);
+
+	}
+
+	public void endHUD()
+	{
+		p.hint(PApplet.ENABLE_DEPTH_TEST);
+		p.popMatrix();
+	}
+
 	abstract public class AbstractInterp
 	{
 		double startTime;
@@ -476,9 +483,7 @@ public class PeasyCam
 				setEndState();
 			}
 			else
-			{
 				interp(t);
-			}
 			feed();
 		}
 
