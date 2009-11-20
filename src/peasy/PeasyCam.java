@@ -27,6 +27,7 @@ import peasy.org.apache.commons.math.geometry.RotationOrder;
 import peasy.org.apache.commons.math.geometry.Vector3D;
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PMatrix3D;
 
 /**
  * 
@@ -65,7 +66,9 @@ public class PeasyCam
 	private final InterpolationManager centerInterps = new InterpolationManager();
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
-	public final String VERSION = "0.6.0";
+	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
+
+	public final String VERSION = "0.6.1";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -79,6 +82,8 @@ public class PeasyCam
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
+		parent.getMatrix(originalMatrix);
+
 		setMouseControlled(true);
 		feed();
 
@@ -438,12 +443,10 @@ public class PeasyCam
 	{
 		p.pushMatrix();
 		p.hint(PApplet.DISABLE_DEPTH_TEST);
-
 		// Load the identity matrix.
 		p.resetMatrix();
 		// Apply the original Processing transformation matrix.
-		p.applyMatrix(1, 0, 0, -p.width / 2f, 0, 1, 0, -p.height / 2f, 0, 0, 1,
-				-346.4102f, 0, 0, 0, 1);
+		p.applyMatrix(originalMatrix);
 
 	}
 
