@@ -172,6 +172,7 @@ void setup() {
 <li>Jeffrey Gentes</li>
 <li><a href="http://imaginationfeed.com">A.W. Martin</a></li>
 <li><a href="http://prototy.blogspot.com/">Yiannis Chatzikonstantinou</a></li>
+<li>Donald Ephraim Curtis</li>
 </ul>
 <p>Please let me know if I've forgotten to acknowledge you.</p>
 
@@ -195,6 +196,21 @@ PeasyCam(PApplet parent, double distance); // look at 0,0,0
 
 <h3>Methods</h3>
 <pre class="prettyprint">camera.setMouseControlled(boolean isMouseControlled);  // default true
+
+// reassign particular drag gestures, or set them to null
+camera.setLeftDragHandler(PeasyDragHandler handler);
+camera.setCenterDragHandler(PeasyDragHandler handler);
+camera.setRightDragHandler(PeasyDragHandler handler);
+PeasyDragHandler getPanDragHandler();
+PeasyDragHandler getRotateDragHandler();
+PeasyDragHandler getZoomDragHandler();
+
+// make your own!
+public interface PeasyDragHandler
+{
+	public void handleDrag(final double dx, final double dy);
+}
+
 camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
 
 camera.lookAt(double x, double y, double z);

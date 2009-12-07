@@ -52,8 +52,6 @@ public class PeasyCam
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
 
-	private PeasyMouseListener mouseListener = null;
-
 	private final DampedAction rotateX, rotateY, rotateZ;
 
 	private double distance;
@@ -66,9 +64,33 @@ public class PeasyCam
 	private final InterpolationManager centerInterps = new InterpolationManager();
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
+	private final PeasyDragHandler panHandler /* ha ha ha */= new PeasyDragHandler() {
+		public void handleDrag(final double dx, final double dy)
+		{
+			mousePan(dx, dy);
+		}
+	};
+	private PeasyDragHandler centerDragHandler = panHandler;
+
+	private final PeasyDragHandler rotateHandler = new PeasyDragHandler() {
+		public void handleDrag(final double dx, final double dy)
+		{
+			mouseRotate(dx, dy);
+		}
+	};
+	private PeasyDragHandler leftDragHandler = rotateHandler;
+
+	private final PeasyDragHandler zoomHandler = new PeasyDragHandler() {
+		public void handleDrag(final double dx, final double dy)
+		{
+			mouseZoom(dy);
+		}
+	};
+	private PeasyDragHandler rightDraghandler = zoomHandler;
+
 	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
 
-	public final String VERSION = "0.6.1";
+	public final String VERSION = "0.7.0";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -84,7 +106,6 @@ public class PeasyCam
 		this.rotation = new Rotation();
 		parent.getMatrix(originalMatrix);
 
-		setMouseControlled(true);
 		feed();
 
 		rotateX = new DampedAction(this) {
@@ -111,33 +132,67 @@ public class PeasyCam
 			}
 		};
 
+		final PeasyMouseListener mouseListener = new PeasyMouseListener();
+		p.registerMouseEvent(mouseListener);
+		p.registerKeyEvent(mouseListener);
+
 		System.err.println("PeasyCam v" + VERSION);
 	}
 
+	/**
+	 * <p>Turn on or off default mouse-drag handling behavior:
+	 * 
+	 * <p><table>
+	 * <tr><td><b>left-drag</b></td><td>rotate camera around look-at point</td><tr>
+	 * <tr><td><b>center-drag</b></td><td>pan camera (change look-at point)</td><tr>
+	 * <tr><td><b>right-drag</b></td><td>zoom</td><tr>
+	 * </table>
+	 * @param isMouseControlled
+	 */
 	public void setMouseControlled(final boolean isMouseControlled)
 	{
 		if (isMouseControlled)
 		{
-			if (mouseListener != null)
-			{
-				PApplet.println("PeasyCam is already listening to mouse.");
-				return;
-			}
-			mouseListener = new PeasyMouseListener();
-			p.registerMouseEvent(mouseListener);
-			p.registerKeyEvent(mouseListener);
+			leftDragHandler = rotateHandler;
+			rightDraghandler = zoomHandler;
+			centerDragHandler = panHandler;
 		}
 		else
 		{
-			if (mouseListener == null)
-			{
-				PApplet.println("PeasyCam is not listening to mouse.");
-				return;
-			}
-			p.unregisterMouseEvent(mouseListener);
-			p.unregisterKeyEvent(mouseListener);
-			mouseListener = null;
+			leftDragHandler = null;
+			rightDraghandler = null;
+			centerDragHandler = null;
 		}
+	}
+
+	public PeasyDragHandler getPanDragHandler()
+	{
+		return panHandler;
+	}
+
+	public PeasyDragHandler getRotateDragHandler()
+	{
+		return rotateHandler;
+	}
+
+	public PeasyDragHandler getZoomDragHandler()
+	{
+		return zoomHandler;
+	}
+
+	public void setLeftDragHandler(final PeasyDragHandler handler)
+	{
+		leftDragHandler = handler;
+	}
+
+	public void setCenterDragHandler(final PeasyDragHandler handler)
+	{
+		centerDragHandler = handler;
+	}
+
+	public void setRightDragHandler(final PeasyDragHandler handler)
+	{
+		rightDraghandler = handler;
 	}
 
 	public String version()
@@ -175,57 +230,60 @@ public class PeasyCam
 					dragConstraint = null;
 
 				final int b = p.mouseButton;
-				if (b == PConstants.CENTER || (b == PConstants.LEFT && e.isMetaDown()))
-					mousePan(dx, dy);
-				else if (b == PConstants.LEFT)
-					mouseRotate(dx, dy);
-				else if (b == PConstants.RIGHT)
-					mouseZoom(dy);
+				if (centerDragHandler != null
+						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
+								.isMetaDown())))
+					centerDragHandler.handleDrag(dx, dy);
+				else if (leftDragHandler != null && b == PConstants.LEFT)
+					leftDragHandler.handleDrag(dx, dy);
+				else if (rightDraghandler != null && b == PConstants.RIGHT)
+					rightDraghandler.handleDrag(dx, dy);
 			}
 		}
 
-		private void mouseZoom(final double delta)
+	}
+
+	private void mouseZoom(final double delta)
+	{
+		safeSetDistance(distance + delta * Math.sqrt(distance * .2));
+	}
+
+	private void mousePan(final double dxMouse, final double dyMouse)
+	{
+		final double panScale = Math.sqrt(distance * .005);
+		pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
+				dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
+	}
+
+	private void mouseRotate(final double dx, final double dy)
+	{
+		final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
+
+		if (dragConstraint != Constraint.X)
 		{
-			safeSetDistance(distance + delta * Math.sqrt(distance * .2));
+			final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
+			final double adz = Math.abs(dy) * rho;
+			final double ady = Math.abs(dy) * (1 - rho);
+			final int ySign = dy < 0 ? -1 : 1;
+			final Vector3D vy = u.add(new Vector3D(0, ady, 0));
+			rotateX.impulse(Vector3D.angle(u, vy) * ySign);
+			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
+			rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
+					* (p.mouseX < p.width / 2 ? -1 : 1));
 		}
 
-		private void mousePan(final double dxMouse, final double dyMouse)
+		if (dragConstraint != Constraint.Y)
 		{
-			final double panScale = Math.sqrt(distance * .005);
-			pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
-					dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
-		}
-
-		private void mouseRotate(final double dx, final double dy)
-		{
-			final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
-
-			if (dragConstraint != Constraint.X)
-			{
-				final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
-				final double adz = Math.abs(dy) * rho;
-				final double ady = Math.abs(dy) * (1 - rho);
-				final int ySign = dy < 0 ? -1 : 1;
-				final Vector3D vy = u.add(new Vector3D(0, ady, 0));
-				rotateX.impulse(Vector3D.angle(u, vy) * ySign);
-				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-						* (p.mouseX < p.width / 2 ? -1 : 1));
-			}
-
-			if (dragConstraint != Constraint.Y)
-			{
-				final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
-						/ (p.height / 2d);
-				final int xSign = dx > 0 ? -1 : 1;
-				final double adz = Math.abs(dx) * eccentricity;
-				final double adx = Math.abs(dx) * (1 - eccentricity);
-				final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
-				rotateY.impulse(Vector3D.angle(u, vx) * xSign);
-				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-						* (p.mouseY > p.height / 2 ? -1 : 1));
-			}
+			final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
+					/ (p.height / 2d);
+			final int xSign = dx > 0 ? -1 : 1;
+			final double adz = Math.abs(dx) * eccentricity;
+			final double adx = Math.abs(dx) * (1 - eccentricity);
+			final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
+			rotateY.impulse(Vector3D.angle(u, vx) * xSign);
+			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
+			rotateZ.impulse(Vector3D.angle(u, vz) * xSign
+					* (p.mouseY > p.height / 2 ? -1 : 1));
 		}
 	}
 

@@ -25,7 +25,22 @@ PeasyCam(PApplet parent, double distance); // look at 0,0,0</pre>
 
 h3. Methods
 
-<pre>camera.setMouseControlled(boolean isMouseControlled);
+<pre>camera.setMouseControlled(boolean isMouseControlled);  // default true
+
+// reassign particular drag gestures, or set them to null
+camera.setLeftDragHandler(PeasyDragHandler handler);
+camera.setCenterDragHandler(PeasyDragHandler handler);
+camera.setRightDragHandler(PeasyDragHandler handler);
+PeasyDragHandler getPanDragHandler();
+PeasyDragHandler getRotateDragHandler();
+PeasyDragHandler getZoomDragHandler();
+
+// make your own!
+public interface PeasyDragHandler
+{
+	public void handleDrag(final double dx, final double dy);
+}
+
 camera.lookAt(double x, double y, double z);
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
 camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
@@ -50,4 +65,4 @@ PeasyCam is impervious to gimbal lock, and has no known "singularities" or disco
 
 h3. Contributors
 
-Thanks: "Oori Shalev":http://ooish.com/, Jeffrey Gentes, "A.W. Martin":http://imaginationfeed.com, and Yiannis Chatzikonstantinou:http://prototy.blogspot.com/ for bug reports and feature suggestions.
+Thanks: "Oori Shalev":http://ooish.com/, Jeffrey Gentes, "A.W. Martin":http://imaginationfeed.com, Yiannis Chatzikonstantinou:http://prototy.blogspot.com/, and Donald Ephraim Curtis for bug reports and feature suggestions.
