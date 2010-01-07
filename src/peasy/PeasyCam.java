@@ -93,14 +93,14 @@ public class PeasyCam
 	private final PeasyWheelHandler zoomWheelHandler = new PeasyWheelHandler() {
 		public void handleWheel(final int delta)
 		{
-			dampedZoom.impulse(delta / 3.0);
+			dampedZoom.impulse(delta);
 		}
 	};
 	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
 
 	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
 
-	public final String VERSION = "0.8.0";
+	public final String VERSION = "0.8.1";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -241,7 +241,7 @@ public class PeasyCam
 		public void mouseWheelMoved(final MouseWheelEvent e)
 		{
 			if (wheelHandler != null)
-				wheelHandler.handleWheel(e.getUnitsToScroll());
+				wheelHandler.handleWheel(e.getWheelRotation());
 		}
 	}
 

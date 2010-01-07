@@ -37,4 +37,5 @@ public class CameraState implements Serializable
 		this.center = center;
 		this.distance = distance;
 	}
+
 }
