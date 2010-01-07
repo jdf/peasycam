@@ -20,6 +20,8 @@ package peasy;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
@@ -52,7 +54,7 @@ public class PeasyCam
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
 
-	private final DampedAction rotateX, rotateY, rotateZ;
+	private final DampedAction rotateX, rotateY, rotateZ, dampedZoom;
 
 	private double distance;
 	private Vector3D center;
@@ -83,14 +85,22 @@ public class PeasyCam
 	private final PeasyDragHandler zoomHandler = new PeasyDragHandler() {
 		public void handleDrag(final double dx, final double dy)
 		{
-			mouseZoom(dy);
+			dampedZoom.impulse(dy / 10.0);
 		}
 	};
 	private PeasyDragHandler rightDraghandler = zoomHandler;
 
+	private final PeasyWheelHandler zoomWheelHandler = new PeasyWheelHandler() {
+		public void handleWheel(final int delta)
+		{
+			dampedZoom.impulse(delta / 3.0);
+		}
+	};
+	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
+
 	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
 
-	public final String VERSION = "0.7.0";
+	public final String VERSION = "0.8.0";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -132,20 +142,29 @@ public class PeasyCam
 			}
 		};
 
+		dampedZoom = new DampedAction(this) {
+			@Override
+			protected void behave(final double velocity)
+			{
+				mouseZoom(velocity);
+			}
+		};
+
 		final PeasyMouseListener mouseListener = new PeasyMouseListener();
 		p.registerMouseEvent(mouseListener);
 		p.registerKeyEvent(mouseListener);
-
+		p.addMouseWheelListener(new PeasyMousewheelListener());
 		System.err.println("PeasyCam v" + VERSION);
 	}
 
 	/**
-	 * <p>Turn on or off default mouse-drag handling behavior:
+	 * <p>Turn on or off default mouse-handling behavior:
 	 * 
 	 * <p><table>
 	 * <tr><td><b>left-drag</b></td><td>rotate camera around look-at point</td><tr>
 	 * <tr><td><b>center-drag</b></td><td>pan camera (change look-at point)</td><tr>
 	 * <tr><td><b>right-drag</b></td><td>zoom</td><tr>
+	 * <tr><td><b>wheel</b></td><td>zoom</td><tr>
 	 * </table>
 	 * @param isMouseControlled
 	 */
@@ -156,12 +175,14 @@ public class PeasyCam
 			leftDragHandler = rotateHandler;
 			rightDraghandler = zoomHandler;
 			centerDragHandler = panHandler;
+			wheelHandler = zoomWheelHandler;
 		}
 		else
 		{
 			leftDragHandler = null;
 			rightDraghandler = null;
 			centerDragHandler = null;
+			wheelHandler = null;
 		}
 	}
 
@@ -180,6 +201,11 @@ public class PeasyCam
 		return zoomHandler;
 	}
 
+	public PeasyWheelHandler getZoomWheelHandler()
+	{
+		return zoomWheelHandler;
+	}
+
 	public void setLeftDragHandler(final PeasyDragHandler handler)
 	{
 		leftDragHandler = handler;
@@ -195,9 +221,28 @@ public class PeasyCam
 		rightDraghandler = handler;
 	}
 
+	public PeasyWheelHandler getWheelHandler()
+	{
+		return wheelHandler;
+	}
+
+	public void setWheelHandler(final PeasyWheelHandler wheelHandler)
+	{
+		this.wheelHandler = wheelHandler;
+	}
+
 	public String version()
 	{
 		return VERSION;
+	}
+
+	protected class PeasyMousewheelListener implements MouseWheelListener
+	{
+		public void mouseWheelMoved(final MouseWheelEvent e)
+		{
+			if (wheelHandler != null)
+				wheelHandler.handleWheel(e.getUnitsToScroll());
+		}
 	}
 
 	protected class PeasyMouseListener
@@ -245,7 +290,7 @@ public class PeasyCam
 
 	private void mouseZoom(final double delta)
 	{
-		safeSetDistance(distance + delta * Math.sqrt(distance * .2));
+		safeSetDistance(distance + delta * Math.log1p(distance));
 	}
 
 	private void mousePan(final double dxMouse, final double dyMouse)

@@ -30,7 +30,7 @@ abstract public class DampedAction
 {
 	private final PeasyCam p;
 	private double velocity;
-	final double dampening;
+	final double damping;
 
 	public DampedAction(final PeasyCam p)
 	{
@@ -41,7 +41,7 @@ abstract public class DampedAction
 	{
 		this.p = p;
 		this.velocity = 0;
-		this.dampening = 1.0 - friction;
+		this.damping = 1.0 - friction;
 		p.getApplet().registerDraw(this);
 	}
 
@@ -58,7 +58,7 @@ abstract public class DampedAction
 		}
 		behave(velocity);
 		p.feed();
-		velocity *= dampening;
+		velocity *= damping;
 		if (Math.abs(velocity) < .001)
 		{
 			velocity = 0;

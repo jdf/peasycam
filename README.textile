@@ -35,10 +35,16 @@ PeasyDragHandler getPanDragHandler();
 PeasyDragHandler getRotateDragHandler();
 PeasyDragHandler getZoomDragHandler();
 
+// mouse wheel zooms by default; set null, or make your own
+camera.setWheelHandler(PeasyWheelHandler handler);
+PeasyWheelHandler getZoomWheelHandler();
+
 // make your own!
-public interface PeasyDragHandler
-{
+public interface PeasyDragHandler {
 	public void handleDrag(final double dx, final double dy);
+}
+public interface PeasyWheelHandler {
+	public void handleWheel(final int delta);
 }
 
 camera.lookAt(double x, double y, double z);
