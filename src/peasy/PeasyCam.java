@@ -54,7 +54,8 @@ public class PeasyCam
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
 
-	private final DampedAction rotateX, rotateY, rotateZ, dampedZoom;
+	private final DampedAction rotateX, rotateY, rotateZ, dampedZoom, dampedPanX,
+			dampedPanY;
 
 	private double distance;
 	private Vector3D center;
@@ -69,7 +70,8 @@ public class PeasyCam
 	private final PeasyDragHandler panHandler /* ha ha ha */= new PeasyDragHandler() {
 		public void handleDrag(final double dx, final double dy)
 		{
-			mousePan(dx, dy);
+			dampedPanX.impulse(dx / 8.);
+			dampedPanY.impulse(dy / 8.);
 		}
 	};
 	private PeasyDragHandler centerDragHandler = panHandler;
@@ -100,7 +102,7 @@ public class PeasyCam
 
 	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
 
-	public final String VERSION = "0.8.1";
+	public final String VERSION = "0.8.2";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -147,6 +149,22 @@ public class PeasyCam
 			protected void behave(final double velocity)
 			{
 				mouseZoom(velocity);
+			}
+		};
+
+		dampedPanX = new DampedAction(this) {
+			@Override
+			protected void behave(final double velocity)
+			{
+				mousePan(velocity, 0);
+			}
+		};
+
+		dampedPanY = new DampedAction(this) {
+			@Override
+			protected void behave(final double velocity)
+			{
+				mousePan(0, velocity);
 			}
 		};
 
