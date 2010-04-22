@@ -4,7 +4,7 @@
        PeasyCam build
     </description>
 
-	<property name="processing" location="c:/Documents and Settings/Administrator/Desktop/processing/processing-1.0.9/libraries" />
+	<property name="processing" location="C:/Documents and Settings/Administrator/My Documents/Processing/libraries" />
 
 	<property name="libraryClasspath" location="${processing}/../lib" />
 	<path id="library-classpath">

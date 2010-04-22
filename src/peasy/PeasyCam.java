@@ -29,6 +29,7 @@ import peasy.org.apache.commons.math.geometry.RotationOrder;
 import peasy.org.apache.commons.math.geometry.Vector3D;
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PGraphics;
 import processing.core.PMatrix3D;
 
 /**
@@ -408,6 +409,18 @@ public class PeasyCam
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
 		p.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
+				(float) center.getX(), (float) center.getY(), (float) center.getZ(),
+				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
+	}
+
+	public static void apply(final CameraState state, final PGraphics g)
+	{
+		final Vector3D center = state.center;
+		final Rotation rotation = state.rotation;
+		final double distance = state.distance;
+		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
+		final Vector3D rup = rotation.applyTo(UP);
+		g.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
 				(float) center.getX(), (float) center.getY(), (float) center.getZ(),
 				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
 	}
