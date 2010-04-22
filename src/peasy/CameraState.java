@@ -22,6 +22,8 @@ import java.io.Serializable;
 
 import peasy.org.apache.commons.math.geometry.Rotation;
 import peasy.org.apache.commons.math.geometry.Vector3D;
+import processing.core.PApplet;
+import processing.core.PGraphics;
 
 public class CameraState implements Serializable
 {
@@ -36,6 +38,18 @@ public class CameraState implements Serializable
 		this.rotation = rotation;
 		this.center = center;
 		this.distance = distance;
+	}
+
+	public void apply(final PApplet a)
+	{
+		if (a.recorder != null)
+			apply(a.recorder);
+		apply(a.g);
+	}
+
+	public void apply(final PGraphics g)
+	{
+		PeasyCam.apply(g, center, rotation, distance);
 	}
 
 }

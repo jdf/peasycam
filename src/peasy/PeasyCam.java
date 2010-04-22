@@ -23,9 +23,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
-import peasy.org.apache.commons.math.geometry.RotationOrder;
 import peasy.org.apache.commons.math.geometry.Vector3D;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -101,7 +99,7 @@ public class PeasyCam
 	};
 	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
 
-	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
+	private final PMatrix3D originalMatrix; // for HUD restore
 
 	public final String VERSION = "0.8.3";
 
@@ -117,7 +115,7 @@ public class PeasyCam
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
-		parent.getMatrix(originalMatrix);
+		this.originalMatrix = parent.getMatrix((PMatrix3D) null);
 
 		feed();
 
@@ -413,20 +411,8 @@ public class PeasyCam
 				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
 	}
 
-	public static void apply(final CameraState state, final PApplet a)
-	{
-		if (a.recorder != null)
-			apply(state, a.recorder);
-		apply(state, a.g);
-	}
-
-	public static void apply(final CameraState state, final PGraphics g)
-	{
-		apply(g, state.center, state.rotation, state.distance);
-	}
-
-	private static void apply(final PGraphics g, final Vector3D center,
-			final Rotation rotation, final double distance)
+	static void apply(final PGraphics g, final Vector3D center, final Rotation rotation,
+			final double distance)
 	{
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
@@ -532,54 +518,6 @@ public class PeasyCam
 		feed();
 	}
 
-	public void setRotations(final double pitch, final double yaw, final double roll)
-	{
-		rotationInterps.cancelInterpolation();
-		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
-		feed();
-	}
-
-	/**
-	 * Express the current camera rotation as an equivalent series
-	 * of world rotations, in X, Y, Z order. This is useful when,
-	 * for example, you wish to orient text towards the camera
-	 * at all times, as in
-	 * 
-	 * <pre>float[] rotations = cam.getRotations(rotations);
-	 *rotateX(rotations[0]);
-	 *rotateY(rotations[1]);
-	 *rotateZ(rotations[2]);
-	 *text("Here I am!", 0, 0, 0);</pre>
-	 */
-	public float[] getRotations()
-	{
-		try
-		{
-			final double[] angles = rotation.getAngles(RotationOrder.XYZ);
-			return new float[] { (float) angles[0], (float) angles[1], (float) angles[2] };
-		}
-		catch (CardanEulerSingularityException e)
-		{
-		}
-		try
-		{
-			final double[] angles = rotation.getAngles(RotationOrder.YXZ);
-			return new float[] { (float) angles[1], (float) angles[0], (float) angles[2] };
-		}
-		catch (CardanEulerSingularityException e)
-		{
-		}
-		try
-		{
-			final double[] angles = rotation.getAngles(RotationOrder.ZXY);
-			return new float[] { (float) angles[2], (float) angles[0], (float) angles[1] };
-		}
-		catch (CardanEulerSingularityException e)
-		{
-		}
-		return new float[] { 0, 0, 0 };
-	}
-
 	/**
 	 * Thanks to A.W. Martin for the code to do HUD
 	 */
@@ -591,7 +529,6 @@ public class PeasyCam
 		p.resetMatrix();
 		// Apply the original Processing transformation matrix.
 		p.applyMatrix(originalMatrix);
-
 	}
 
 	public void endHUD()
