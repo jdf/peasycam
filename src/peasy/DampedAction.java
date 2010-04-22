@@ -24,49 +24,41 @@ package peasy;
  * http://www.davebollinger.com/works/p5/catmouse/CatMouse.pde.txt
  * 
  * @author jdf
- *
+ * 
  */
-abstract public class DampedAction
-{
+abstract public class DampedAction {
 	private final PeasyCam p;
 	private double velocity;
 	final double damping;
 
-	public DampedAction(final PeasyCam p)
-	{
+	public DampedAction(final PeasyCam p) {
 		this(p, 0.16);
 	}
 
-	public DampedAction(final PeasyCam p, final double friction)
-	{
+	public DampedAction(final PeasyCam p, final double friction) {
 		this.p = p;
 		this.velocity = 0;
 		this.damping = 1.0 - friction;
 		p.getApplet().registerDraw(this);
 	}
 
-	public void impulse(final double impulse)
-	{
+	public void impulse(final double impulse) {
 		velocity += impulse;
 	}
 
-	public void draw()
-	{
-		if (velocity == 0)
-		{
+	public void draw() {
+		if (velocity == 0) {
 			return;
 		}
 		behave(velocity);
 		p.feed();
 		velocity *= damping;
-		if (Math.abs(velocity) < .001)
-		{
+		if (Math.abs(velocity) < .001) {
 			velocity = 0;
 		}
 	}
 
-	public void stop()
-	{
+	public void stop() {
 		velocity = 0;
 	}
 

@@ -25,30 +25,27 @@ import peasy.org.apache.commons.math.geometry.Vector3D;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 
-public class CameraState implements Serializable
-{
+public class CameraState implements Serializable {
 	private static final long serialVersionUID = 1L;
 	final Rotation rotation;
 	final Vector3D center;
 	final double distance;
 
 	public CameraState(final Rotation rotation, final Vector3D center,
-			final double distance)
-	{
+			final double distance) {
 		this.rotation = rotation;
 		this.center = center;
 		this.distance = distance;
 	}
 
-	public void apply(final PApplet a)
-	{
-		if (a.recorder != null)
+	public void apply(final PApplet a) {
+		if (a.recorder != null) {
 			apply(a.recorder);
+		}
 		apply(a.g);
 	}
 
-	public void apply(final PGraphics g)
-	{
+	public void apply(final PGraphics g) {
 		PeasyCam.apply(g, center, rotation, distance);
 	}
 

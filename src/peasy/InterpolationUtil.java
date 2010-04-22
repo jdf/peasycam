@@ -21,23 +21,18 @@ package peasy;
 import peasy.org.apache.commons.math.geometry.Rotation;
 import peasy.org.apache.commons.math.geometry.Vector3D;
 
-public class InterpolationUtil
-{
-	static public Rotation slerp(final Rotation a, final Rotation b, final double t)
-	{
+public class InterpolationUtil {
+	static public Rotation slerp(final Rotation a, final Rotation b, final double t) {
 		final double cosTheta = a.getQ0() * b.getQ0() + a.getQ1() * b.getQ1() + a.getQ2()
 				* b.getQ2() + a.getQ3() * b.getQ3();
 		final double theta = Math.acos(cosTheta);
 		final double sinTheta = Math.sin(theta);
 
 		double w1, w2;
-		if (sinTheta > 0.001f)
-		{
+		if (sinTheta > 0.001f) {
 			w1 = Math.sin((1.0f - t) * theta) / sinTheta;
 			w2 = Math.sin(t * theta) / sinTheta;
-		}
-		else
-		{
+		} else {
 			w1 = 1.0 - t;
 			w2 = t;
 		}
@@ -46,26 +41,22 @@ public class InterpolationUtil
 				* b.getQ3(), true);
 	}
 
-	static public double smooth(final double a, final double b, final double t)
-	{
+	static public double smooth(final double a, final double b, final double t) {
 		final double smooth = (t * t * (3 - 2 * t));
 		return (b * smooth) + (a * (1 - smooth));
 
 	}
 
-	static public Vector3D smooth(final Vector3D a, final Vector3D b, final double t)
-	{
+	static public Vector3D smooth(final Vector3D a, final Vector3D b, final double t) {
 		return new Vector3D(smooth(a.getX(), b.getX(), t), smooth(a.getY(), b.getY(), t),
 				smooth(a.getZ(), b.getZ(), t));
 	}
 
-	static public double linear(final double a, final double b, final double t)
-	{
+	static public double linear(final double a, final double b, final double t) {
 		return a + (b - a) * t;
 	}
 
-	static public Vector3D linear(final Vector3D a, final Vector3D b, final double t)
-	{
+	static public Vector3D linear(final Vector3D a, final Vector3D b, final double t) {
 		return new Vector3D(linear(a.getX(), b.getX(), t), linear(a.getY(), b.getY(), t),
 				linear(a.getZ(), b.getZ(), t));
 	}

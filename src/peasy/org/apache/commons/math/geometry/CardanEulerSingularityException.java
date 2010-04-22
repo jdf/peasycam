@@ -19,26 +19,29 @@ package peasy.org.apache.commons.math.geometry;
 
 import peasy.org.apache.commons.math.MathException;
 
-/** This class represents exceptions thrown while extractiong Cardan
- * or Euler angles from a rotation.
-
- * @version $Revision: 620312 $ $Date: 2008-02-10 12:28:59 -0700 (Sun, 10 Feb 2008) $
+/**
+ * This class represents exceptions thrown while extractiong Cardan or Euler
+ * angles from a rotation.
+ * 
+ * @version $Revision: 620312 $ $Date: 2008-02-10 12:28:59 -0700 (Sun, 10 Feb
+ *          2008) $
  * @since 1.2
  */
-public class CardanEulerSingularityException
-  extends MathException {
+public class CardanEulerSingularityException extends MathException {
 
-  /** 
-   * Simple constructor.
-   * build an exception with a default message.
-   * @param isCardan if true, the rotation is related to Cardan angles,
-   * if false it is related to EulerAngles
-   */
-  public CardanEulerSingularityException(boolean isCardan) {
-    super(isCardan ? "Cardan angles singularity" : "Euler angles singularity", new Object[0]);
-  }
+	/**
+	 * Simple constructor. build an exception with a default message.
+	 * 
+	 * @param isCardan
+	 *            if true, the rotation is related to Cardan angles, if false it
+	 *            is related to EulerAngles
+	 */
+	public CardanEulerSingularityException(final boolean isCardan) {
+		super(isCardan ? "Cardan angles singularity" : "Euler angles singularity",
+				new Object[0]);
+	}
 
-  /** Serializable version identifier */
-  private static final long serialVersionUID = -1360952845582206770L;
+	/** Serializable version identifier */
+	private static final long serialVersionUID = -1360952845582206770L;
 
 }
