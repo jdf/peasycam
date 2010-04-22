@@ -4,9 +4,12 @@
        PeasyCam build
     </description>
 
-	<property name="processing" location="C:/Documents and Settings/Administrator/My Documents/Processing/libraries" />
+	<property name="processing" 
+		location="C:/Documents and Settings/Administrator/Desktop/processing/processing-0182" />
+	<property name="processingLibraries" 
+		location="C:/Documents and Settings/Administrator/My Documents/Processing/libraries" />
 
-	<property name="libraryClasspath" location="${processing}/../lib" />
+	<property name="libraryClasspath" location="${processing}/lib" />
 	<path id="library-classpath">
 		<fileset dir="${libraryClasspath}">
 			<include name="core.jar" />
@@ -18,7 +21,7 @@
 	<property name="author" value="Jonathan Feinberg" />
 	<property name="copyright" value="(c) 2008" />
 	<property name="libraryName" value="PeasyCam" />
-	<property name="versionNumber" value="0.8.2" />
+	<property name="versionNumber" value="0.8.3" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />
@@ -52,7 +55,7 @@
 	src path			${src}
 	bin path 			${bin}
 	libraryClasspath		${libraryClasspath}
-	processing Libraries	${processing}
+	processing Libraries	${processingLibraries}
 	java version		${javaVersion}
 	</echo>
 		<echo>building library ...</echo>
@@ -90,6 +93,9 @@
 			replace='VERSION = "${versionNumber}"' 
 			file="${src}/peasy/PeasyCam.java"/>
 
+		<echo message="bin: ${bin}"/>
+		<echo message="javaVersion: ${javaVersion}"/>
+		<echo message="library-classpath$ ${library-classpath}"/>
 		<javac destdir="${bin}" source="${javaVersion}">
 			<classpath>
 				<path refid="library-classpath" />
@@ -137,7 +143,7 @@
 		</copy>
 
 		<!-- copy the jar file to processing's libraries -->
-		<copy todir="${processing}">
+		<copy todir="${processingLibraries}">
 			<fileset dir="${dist}" />
 		</copy>
 
@@ -202,7 +208,7 @@
 		<mkdir dir="${dist}/web/download" />
 		<copy file="${dist}/${libraryName}_${versionNumber}.zip" todir="${dist}/web/download" />
 
-		<copy todir="${processing}/${libraryName}/reference">
+		<copy todir="${processingLibraries}/${libraryName}/reference">
 			<fileset dir="${reference}" />
 		</copy>
 

@@ -103,7 +103,7 @@ public class PeasyCam
 
 	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
 
-	public final String VERSION = "0.8.2";
+	public final String VERSION = "0.8.3";
 
 	public PeasyCam(final PApplet parent, final double distance)
 	{
@@ -413,11 +413,21 @@ public class PeasyCam
 				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
 	}
 
+	public static void apply(final CameraState state, final PApplet a)
+	{
+		if (a.recorder != null)
+			apply(state, a.recorder);
+		apply(state, a.g);
+	}
+
 	public static void apply(final CameraState state, final PGraphics g)
 	{
-		final Vector3D center = state.center;
-		final Rotation rotation = state.rotation;
-		final double distance = state.distance;
+		apply(g, state.center, state.rotation, state.distance);
+	}
+
+	private static void apply(final PGraphics g, final Vector3D center,
+			final Rotation rotation, final double distance)
+	{
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
 		g.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
