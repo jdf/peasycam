@@ -23,7 +23,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
+import peasy.org.apache.commons.math.geometry.RotationOrder;
 import peasy.org.apache.commons.math.geometry.Vector3D;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -468,6 +470,43 @@ public class PeasyCam {
 			this.distance = state.distance;
 		}
 		feed();
+	}
+
+	public void setRotations(final double pitch, final double yaw, final double roll) {
+		rotationInterps.cancelInterpolation();
+		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		feed();
+	}
+
+	/**
+	 * Express the current camera rotation as an equivalent series
+	 * of world rotations, in X, Y, Z order. This is useful when,
+	 * for example, you wish to orient text towards the camera
+	 * at all times, as in
+	 * 
+	 * <pre>float[] rotations = cam.getRotations(rotations);
+	 *rotateX(rotations[0]);
+	 *rotateY(rotations[1]);
+	 *rotateZ(rotations[2]);
+	 *text("Here I am!", 0, 0, 0);</pre>
+	 */
+	public float[] getRotations() {
+		try {
+			final double[] angles = rotation.getAngles(RotationOrder.XYZ);
+			return new float[] { (float)angles[0], (float)angles[1], (float)angles[2] };
+		} catch (final CardanEulerSingularityException e) {
+		}
+		try {
+			final double[] angles = rotation.getAngles(RotationOrder.YXZ);
+			return new float[] { (float)angles[1], (float)angles[0], (float)angles[2] };
+		} catch (final CardanEulerSingularityException e) {
+		}
+		try {
+			final double[] angles = rotation.getAngles(RotationOrder.ZXY);
+			return new float[] { (float)angles[2], (float)angles[0], (float)angles[1] };
+		} catch (final CardanEulerSingularityException e) {
+		}
+		return new float[] { 0, 0, 0 };
 	}
 
 	/**
