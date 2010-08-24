@@ -522,8 +522,7 @@ public class PeasyCam {
 
 		rotationInterps.cancelInterpolation();
 		if (animationTimeMillis > 0) {
-			Rotation rotation;
-			rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+			Rotation rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
 
 			rotationInterps.startInterpolation(new RotationInterp(rotation,
 					animationTimeMillis));
