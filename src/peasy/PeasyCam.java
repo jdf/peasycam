@@ -36,11 +36,13 @@ import processing.core.PMatrix3D;
  * 
  * @author Jonathan Feinberg
  */
-public class PeasyCam {
+public class PeasyCam
+{
 	private static final Vector3D LOOK = Vector3D.plusK;
 	private static final Vector3D UP = Vector3D.plusJ;
 
-	private static enum Constraint {
+	private static enum Constraint
+	{
 		X, Y
 	}
 
@@ -67,7 +69,8 @@ public class PeasyCam {
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
 	private final PeasyDragHandler panHandler /* ha ha ha */= new PeasyDragHandler() {
-		public void handleDrag(final double dx, final double dy) {
+		public void handleDrag(final double dx, final double dy)
+		{
 			dampedPanX.impulse(dx / 8.);
 			dampedPanY.impulse(dy / 8.);
 		}
@@ -75,82 +78,93 @@ public class PeasyCam {
 	private PeasyDragHandler centerDragHandler = panHandler;
 
 	private final PeasyDragHandler rotateHandler = new PeasyDragHandler() {
-		public void handleDrag(final double dx, final double dy) {
+		public void handleDrag(final double dx, final double dy)
+		{
 			mouseRotate(dx, dy);
 		}
 	};
 	private PeasyDragHandler leftDragHandler = rotateHandler;
 
 	private final PeasyDragHandler zoomHandler = new PeasyDragHandler() {
-		public void handleDrag(final double dx, final double dy) {
+		public void handleDrag(final double dx, final double dy)
+		{
 			dampedZoom.impulse(dy / 10.0);
 		}
 	};
 	private PeasyDragHandler rightDraghandler = zoomHandler;
 
 	private final PeasyWheelHandler zoomWheelHandler = new PeasyWheelHandler() {
-		public void handleWheel(final int delta) {
+		public void handleWheel(final int delta)
+		{
 			dampedZoom.impulse(delta);
 		}
 	};
 	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
 
-	private final PMatrix3D originalMatrix; // for HUD restore
+	private final PMatrix3D originalMatrix = new PMatrix3D(); // for HUD restore
 
 	public final String VERSION = "0.8.3";
 
-	public PeasyCam(final PApplet parent, final double distance) {
+	public PeasyCam(final PApplet parent, final double distance)
+	{
 		this(parent, 0, 0, 0, distance);
 	}
 
 	public PeasyCam(final PApplet parent, final double lookAtX, final double lookAtY,
-			final double lookAtZ, final double distance) {
+			final double lookAtZ, final double distance)
+	{
 		this.p = parent;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
-		this.originalMatrix = parent.getMatrix((PMatrix3D)null);
+		parent.getMatrix(originalMatrix);
 
 		feed();
 
 		rotateX = new DampedAction(this) {
 			@Override
-			protected void behave(final double velocity) {
+			protected void behave(final double velocity)
+			{
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusI, velocity));
 			}
 		};
 
 		rotateY = new DampedAction(this) {
 			@Override
-			protected void behave(final double velocity) {
+			protected void behave(final double velocity)
+			{
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusJ, velocity));
 			}
 		};
 
 		rotateZ = new DampedAction(this) {
 			@Override
-			protected void behave(final double velocity) {
+			protected void behave(final double velocity)
+			{
 				rotation = rotation.applyTo(new Rotation(Vector3D.plusK, velocity));
 			}
 		};
 
 		dampedZoom = new DampedAction(this) {
 			@Override
-			protected void behave(final double velocity) {
+			protected void behave(final double velocity)
+			{
 				mouseZoom(velocity);
 			}
 		};
 
 		dampedPanX = new DampedAction(this) {
 			@Override
-			protected void behave(final double velocity) {
+			protected void behave(final double velocity)
+			{
 				mousePan(velocity, 0);
 			}
 		};
 
 		dampedPanY = new DampedAction(this) {
 			@Override
-			protected void behave(final double velocity) {
+			protected void behave(final double velocity)
+			{
 				mousePan(0, velocity);
 			}
 		};
@@ -163,38 +177,27 @@ public class PeasyCam {
 	}
 
 	/**
-	 * <p>
-	 * Turn on or off default mouse-handling behavior:
+	 * <p>Turn on or off default mouse-handling behavior:
 	 * 
-	 * <p>
-	 * <table>
-	 * <tr>
-	 * <td><b>left-drag</b></td>
-	 * <td>rotate camera around look-at point</td>
-	 * <tr>
-	 * <tr>
-	 * <td><b>center-drag</b></td>
-	 * <td>pan camera (change look-at point)</td>
-	 * <tr>
-	 * <tr>
-	 * <td><b>right-drag</b></td>
-	 * <td>zoom</td>
-	 * <tr>
-	 * <tr>
-	 * <td><b>wheel</b></td>
-	 * <td>zoom</td>
-	 * <tr>
+	 * <p><table>
+	 * <tr><td><b>left-drag</b></td><td>rotate camera around look-at point</td><tr>
+	 * <tr><td><b>center-drag</b></td><td>pan camera (change look-at point)</td><tr>
+	 * <tr><td><b>right-drag</b></td><td>zoom</td><tr>
+	 * <tr><td><b>wheel</b></td><td>zoom</td><tr>
 	 * </table>
-	 * 
 	 * @param isMouseControlled
 	 */
-	public void setMouseControlled(final boolean isMouseControlled) {
-		if (isMouseControlled) {
+	public void setMouseControlled(final boolean isMouseControlled)
+	{
+		if (isMouseControlled)
+		{
 			leftDragHandler = rotateHandler;
 			rightDraghandler = zoomHandler;
 			centerDragHandler = panHandler;
 			wheelHandler = zoomWheelHandler;
-		} else {
+		}
+		else
+		{
 			leftDragHandler = null;
 			rightDraghandler = null;
 			centerDragHandler = null;
@@ -202,109 +205,126 @@ public class PeasyCam {
 		}
 	}
 
-	public PeasyDragHandler getPanDragHandler() {
+	public PeasyDragHandler getPanDragHandler()
+	{
 		return panHandler;
 	}
 
-	public PeasyDragHandler getRotateDragHandler() {
+	public PeasyDragHandler getRotateDragHandler()
+	{
 		return rotateHandler;
 	}
 
-	public PeasyDragHandler getZoomDragHandler() {
+	public PeasyDragHandler getZoomDragHandler()
+	{
 		return zoomHandler;
 	}
 
-	public PeasyWheelHandler getZoomWheelHandler() {
+	public PeasyWheelHandler getZoomWheelHandler()
+	{
 		return zoomWheelHandler;
 	}
 
-	public void setLeftDragHandler(final PeasyDragHandler handler) {
+	public void setLeftDragHandler(final PeasyDragHandler handler)
+	{
 		leftDragHandler = handler;
 	}
 
-	public void setCenterDragHandler(final PeasyDragHandler handler) {
+	public void setCenterDragHandler(final PeasyDragHandler handler)
+	{
 		centerDragHandler = handler;
 	}
 
-	public void setRightDragHandler(final PeasyDragHandler handler) {
+	public void setRightDragHandler(final PeasyDragHandler handler)
+	{
 		rightDraghandler = handler;
 	}
 
-	public PeasyWheelHandler getWheelHandler() {
+	public PeasyWheelHandler getWheelHandler()
+	{
 		return wheelHandler;
 	}
 
-	public void setWheelHandler(final PeasyWheelHandler wheelHandler) {
+	public void setWheelHandler(final PeasyWheelHandler wheelHandler)
+	{
 		this.wheelHandler = wheelHandler;
 	}
 
-	public String version() {
+	public String version()
+	{
 		return VERSION;
 	}
 
-	protected class PeasyMousewheelListener implements MouseWheelListener {
-		public void mouseWheelMoved(final MouseWheelEvent e) {
-			if (wheelHandler != null) {
+	protected class PeasyMousewheelListener implements MouseWheelListener
+	{
+		public void mouseWheelMoved(final MouseWheelEvent e)
+		{
+			if (wheelHandler != null)
 				wheelHandler.handleWheel(e.getWheelRotation());
-			}
 		}
 	}
 
-	protected class PeasyMouseListener {
-		public void keyEvent(final KeyEvent e) {
-			if (e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_SHIFT) {
+	protected class PeasyMouseListener
+	{
+		public void keyEvent(final KeyEvent e)
+		{
+			if (e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_SHIFT)
 				dragConstraint = null;
-			}
 		}
 
-		public void mouseEvent(final MouseEvent e) {
+		public void mouseEvent(final MouseEvent e)
+		{
 			if (resetOnDoubleClick && e.getID() == MouseEvent.MOUSE_CLICKED
-					&& e.getClickCount() == 2) {
+					&& e.getClickCount() == 2)
 				reset();
-			} else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+			else if (e.getID() == MouseEvent.MOUSE_RELEASED)
 				dragConstraint = null;
-			} else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
+			else if (e.getID() == MouseEvent.MOUSE_DRAGGED)
+			{
 				final double dx = p.mouseX - p.pmouseX;
 				final double dy = p.mouseY - p.pmouseY;
 
-				if (e.isShiftDown()) {
-					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
+				if (e.isShiftDown())
+				{
+					if (dragConstraint == null && Math.abs(dx - dy) > 1)
 						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.X
 								: Constraint.Y;
-					}
-				} else {
-					dragConstraint = null;
 				}
+				else
+					dragConstraint = null;
 
 				final int b = p.mouseButton;
 				if (centerDragHandler != null
 						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
-								.isMetaDown()))) {
+								.isMetaDown())))
 					centerDragHandler.handleDrag(dx, dy);
-				} else if (leftDragHandler != null && b == PConstants.LEFT) {
+				else if (leftDragHandler != null && b == PConstants.LEFT)
 					leftDragHandler.handleDrag(dx, dy);
-				} else if (rightDraghandler != null && b == PConstants.RIGHT) {
+				else if (rightDraghandler != null && b == PConstants.RIGHT)
 					rightDraghandler.handleDrag(dx, dy);
-				}
 			}
 		}
 
 	}
 
-	private void mouseZoom(final double delta) {
+	private void mouseZoom(final double delta)
+	{
 		safeSetDistance(distance + delta * Math.log1p(distance));
 	}
 
-	private void mousePan(final double dxMouse, final double dyMouse) {
+	private void mousePan(final double dxMouse, final double dyMouse)
+	{
 		final double panScale = Math.sqrt(distance * .005);
 		pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
 				dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
 	}
 
-	private void mouseRotate(final double dx, final double dy) {
+	private void mouseRotate(final double dx, final double dy)
+	{
 		final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
 
-		if (dragConstraint != Constraint.X) {
+		if (dragConstraint != Constraint.X)
+		{
 			final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
 			final double adz = Math.abs(dy) * rho;
 			final double ady = Math.abs(dy) * (1 - rho);
@@ -316,7 +336,8 @@ public class PeasyCam {
 					* (p.mouseX < p.width / 2 ? -1 : 1));
 		}
 
-		if (dragConstraint != Constraint.Y) {
+		if (dragConstraint != Constraint.Y)
+		{
 			final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
 					/ (p.height / 2d);
 			final int xSign = dx > 0 ? -1 : 1;
@@ -330,152 +351,223 @@ public class PeasyCam {
 		}
 	}
 
-	public double getDistance() {
+	public double getDistance()
+	{
 		return distance;
 	}
 
-	public void setDistance(final double newDistance) {
+	public void setDistance(final double newDistance)
+	{
 		setDistance(newDistance, 300);
 	}
 
-	public void setDistance(final double newDistance, final long animationTimeMillis) {
+	public void setDistance(final double newDistance, final long animationTimeMillis)
+	{
 		distanceInterps.startInterpolation(new DistanceInterp(newDistance,
 				animationTimeMillis));
 	}
 
-	public float[] getLookAt() {
-		return new float[] { (float)center.getX(), (float)center.getY(),
-				(float)center.getZ() };
+	public float[] getLookAt()
+	{
+		return new float[] { (float) center.getX(), (float) center.getY(),
+				(float) center.getZ() };
 	}
 
-	public void lookAt(final double x, final double y, final double z) {
+	public void lookAt(final double x, final double y, final double z)
+	{
 		centerInterps.startInterpolation(new CenterInterp(new Vector3D(x, y, z), 300));
 	}
 
 	public void lookAt(final double x, final double y, final double z,
-			final double distance) {
+			final double distance)
+	{
 		lookAt(x, y, z);
 		setDistance(distance);
 	}
 
 	public void lookAt(final double x, final double y, final double z,
-			final long animationTimeMillis) {
+			final long animationTimeMillis)
+	{
 		lookAt(x, y, z, distance, animationTimeMillis);
 	}
 
 	public void lookAt(final double x, final double y, final double z,
-			final double distance, final long animationTimeMillis) {
+			final double distance, final long animationTimeMillis)
+	{
 		setState(new CameraState(rotation, new Vector3D(x, y, z), distance),
 				animationTimeMillis);
 	}
 
-	private void safeSetDistance(final double distance) {
+	private void safeSetDistance(final double distance)
+	{
 		this.distance = Math.min(maximumDistance, Math.max(minimumDistance, distance));
 		feed();
 	}
 
-	public void feed() {
+	public void feed()
+	{
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
-		p.camera((float)pos.getX(), (float)pos.getY(), (float)pos.getZ(), //
-				(float)center.getX(), (float)center.getY(), (float)center.getZ(), //
-				(float)rup.getX(), (float)rup.getY(), (float)rup.getZ());
+		p.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
+				(float) center.getX(), (float) center.getY(), (float) center.getZ(),
+				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
 	}
 
 	static void apply(final PGraphics g, final Vector3D center, final Rotation rotation,
-			final double distance) {
+			final double distance)
+	{
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
-		g.camera((float)pos.getX(), (float)pos.getY(), (float)pos.getZ(), //
-				(float)center.getX(), (float)center.getY(), (float)center.getZ(), //
-				(float)rup.getX(), (float)rup.getY(), (float)rup.getZ());
+		g.camera((float) pos.getX(), (float) pos.getY(), (float) pos.getZ(),
+				(float) center.getX(), (float) center.getY(), (float) center.getZ(),
+				(float) rup.getX(), (float) rup.getY(), (float) rup.getZ());
 	}
 
 	/**
 	 * Where is the PeasyCam in world space?
-	 * 
 	 * @return float[]{x,y,z}
 	 */
-	public float[] getPosition() {
+	public float[] getPosition()
+	{
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
-		return new float[] { (float)pos.getX(), (float)pos.getY(), (float)pos.getZ() };
+		return new float[] { (float) pos.getX(), (float) pos.getY(), (float) pos.getZ() };
 	}
 
-	public void reset() {
+	public void reset()
+	{
 		reset(300);
 	}
 
-	public void reset(final long animationTimeInMillis) {
+	public void reset(final long animationTimeInMillis)
+	{
 		setState(new CameraState(new Rotation(), startCenter, startDistance),
 				animationTimeInMillis);
 	}
 
-	public void pan(final double dx, final double dy) {
+	public void pan(final double dx, final double dy)
+	{
 		center = center.add(rotation.applyTo(new Vector3D(dx, dy, 0)));
 		feed();
 	}
 
-	public void rotateX(final double angle) {
+	public void rotateX(final double angle)
+	{
 		rotation = rotation.applyTo(new Rotation(Vector3D.plusI, angle));
 		feed();
 	}
 
-	public void rotateY(final double angle) {
+	public void rotateY(final double angle)
+	{
 		rotation = rotation.applyTo(new Rotation(Vector3D.plusJ, angle));
 		feed();
 	}
 
-	public void rotateZ(final double angle) {
+	public void rotateZ(final double angle)
+	{
 		rotation = rotation.applyTo(new Rotation(Vector3D.plusK, angle));
 		feed();
 	}
 
-	PApplet getApplet() {
+	PApplet getApplet()
+	{
 		return p;
 	}
 
-	public CameraState getState() {
+	public CameraState getState()
+	{
 		return new CameraState(rotation, center, distance);
 	}
 
-	public void setMinimumDistance(final double minimumDistance) {
+	public void setMinimumDistance(final double minimumDistance)
+	{
 		this.minimumDistance = minimumDistance;
 		safeSetDistance(distance);
 	}
 
-	public void setMaximumDistance(final double maximumDistance) {
+	public void setMaximumDistance(final double maximumDistance)
+	{
 		this.maximumDistance = maximumDistance;
 		safeSetDistance(distance);
 	}
 
-	public void setResetOnDoubleClick(final boolean resetOnDoubleClick) {
+	public void setResetOnDoubleClick(final boolean resetOnDoubleClick)
+	{
 		this.resetOnDoubleClick = resetOnDoubleClick;
 	}
 
-	public void setState(final CameraState state) {
+	public void setState(final CameraState state)
+	{
 		setState(state, 300);
 	}
 
-	public void setState(final CameraState state, final long animationTimeMillis) {
-		if (animationTimeMillis > 0) {
+	public void setState(final CameraState state, final long animationTimeMillis)
+	{
+		if (animationTimeMillis > 0)
+		{
 			rotationInterps.startInterpolation(new RotationInterp(state.rotation,
 					animationTimeMillis));
 			centerInterps.startInterpolation(new CenterInterp(state.center,
 					animationTimeMillis));
 			distanceInterps.startInterpolation(new DistanceInterp(state.distance,
 					animationTimeMillis));
-		} else {
+		}
+		else
+		{
 			this.rotation = state.rotation;
 			this.center = state.center;
 			this.distance = state.distance;
 		}
 		feed();
 	}
+	
+	public void lookThrough(final double x, final double y, final double z) {
+		double rollorientation = 90 * Math.PI/180;
+		this.lookThrough(x, y, z, distance, 0, rollorientation);
+	}
+	
+	public void lookThrough(final double x, final double y, final double z, final long animationTimeMillis) {
+		double rollorientation = 90 * Math.PI/180;
+		this.lookThrough(x, y, z, distance, animationTimeMillis, rollorientation);
+	}
+	
+	public void lookThrough(final double x, final double y, final double z, final double distance, final long animationTimeMillis) {
+		double rollorientation = 90 * Math.PI/180;
+		this.lookThrough(x, y, z, distance, animationTimeMillis, rollorientation);
+	}
+	
+	public void lookThrough(final double x, final double y, final double z, final double distance, final long animationTimeMillis, final double rollorientation) {
+		double r = Math.sqrt(y*y+x*x+z*z);
+		double yaw = Math.atan2(x, y);
+		double roll = Math.acos(-z/r) + rollorientation;
+		double pitch = -Math.PI/2;
 
-	public void setRotations(final double pitch, final double yaw, final double roll) {
+		setRotations(pitch,yaw,roll, distance, animationTimeMillis);
+	}
+	
+	public void setRotations(final double pitch, final double yaw, final double roll, final double distance, final long animationTimeMillis)
+	{
+		
 		rotationInterps.cancelInterpolation();
-		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		if (animationTimeMillis > 0)
+		{
+			Rotation rotation;
+			rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+			
+			rotationInterps.startInterpolation(new RotationInterp(rotation,
+				animationTimeMillis));
+			distanceInterps.startInterpolation(new DistanceInterp(distance,
+					animationTimeMillis));
+		}
+		else {
+			this.distance = distance;
+			this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		}
 		feed();
+	}
+
+	public void setRotations(final double pitch, final double yaw, final double roll)
+	{
+		this.setRotations(pitch, yaw, roll, distance, 0);
 	}
 
 	/**
@@ -490,21 +582,31 @@ public class PeasyCam {
 	 *rotateZ(rotations[2]);
 	 *text("Here I am!", 0, 0, 0);</pre>
 	 */
-	public float[] getRotations() {
-		try {
+	public float[] getRotations()
+	{
+		try
+		{
 			final double[] angles = rotation.getAngles(RotationOrder.XYZ);
-			return new float[] { (float)angles[0], (float)angles[1], (float)angles[2] };
-		} catch (final CardanEulerSingularityException e) {
+			return new float[] { (float) angles[0], (float) angles[1], (float) angles[2] };
 		}
-		try {
+		catch (CardanEulerSingularityException e)
+		{
+		}
+		try
+		{
 			final double[] angles = rotation.getAngles(RotationOrder.YXZ);
-			return new float[] { (float)angles[1], (float)angles[0], (float)angles[2] };
-		} catch (final CardanEulerSingularityException e) {
+			return new float[] { (float) angles[1], (float) angles[0], (float) angles[2] };
 		}
-		try {
+		catch (CardanEulerSingularityException e)
+		{
+		}
+		try
+		{
 			final double[] angles = rotation.getAngles(RotationOrder.ZXY);
-			return new float[] { (float)angles[2], (float)angles[0], (float)angles[1] };
-		} catch (final CardanEulerSingularityException e) {
+			return new float[] { (float) angles[2], (float) angles[0], (float) angles[1] };
+		}
+		catch (CardanEulerSingularityException e)
+		{
 		}
 		return new float[] { 0, 0, 0 };
 	}
@@ -512,45 +614,54 @@ public class PeasyCam {
 	/**
 	 * Thanks to A.W. Martin for the code to do HUD
 	 */
-	public void beginHUD() {
+	public void beginHUD()
+	{
 		p.pushMatrix();
-		p.hint(PConstants.DISABLE_DEPTH_TEST);
+		p.hint(PApplet.DISABLE_DEPTH_TEST);
 		// Load the identity matrix.
 		p.resetMatrix();
 		// Apply the original Processing transformation matrix.
 		p.applyMatrix(originalMatrix);
+
 	}
 
-	public void endHUD() {
-		p.hint(PConstants.ENABLE_DEPTH_TEST);
+	public void endHUD()
+	{
+		p.hint(PApplet.ENABLE_DEPTH_TEST);
 		p.popMatrix();
 	}
 
-	abstract public class AbstractInterp {
+	abstract public class AbstractInterp
+	{
 		double startTime;
 		final double timeInMillis;
 
-		protected AbstractInterp(final long timeInMillis) {
+		protected AbstractInterp(final long timeInMillis)
+		{
 			this.timeInMillis = timeInMillis;
 		}
 
-		void start() {
+		void start()
+		{
 			startTime = p.millis();
 			p.registerDraw(this);
 		}
 
-		void cancel() {
+		void cancel()
+		{
 			p.unregisterDraw(this);
 		}
 
-		public void draw() {
+		public void draw()
+		{
 			final double t = (p.millis() - startTime) / timeInMillis;
-			if (t > .99) {
+			if (t > .99)
+			{
 				cancel();
 				setEndState();
-			} else {
-				interp(t);
 			}
+			else
+				interp(t);
 			feed();
 		}
 
@@ -559,58 +670,69 @@ public class PeasyCam {
 		protected abstract void setEndState();
 	}
 
-	class DistanceInterp extends AbstractInterp {
+	class DistanceInterp extends AbstractInterp
+	{
 		private final double startDistance = distance;
 		private final double endDistance;
 
-		public DistanceInterp(final double endDistance, final long timeInMillis) {
+		public DistanceInterp(final double endDistance, final long timeInMillis)
+		{
 			super(timeInMillis);
 			this.endDistance = Math.min(maximumDistance, Math.max(minimumDistance,
 					endDistance));
 		}
 
 		@Override
-		protected void interp(final double t) {
+		protected void interp(final double t)
+		{
 			distance = InterpolationUtil.smooth(startDistance, endDistance, t);
 		}
 
 		@Override
-		protected void setEndState() {
+		protected void setEndState()
+		{
 			distance = endDistance;
 		}
 	}
 
-	class CenterInterp extends AbstractInterp {
+	class CenterInterp extends AbstractInterp
+	{
 		private final Vector3D startCenter = center;
 		private final Vector3D endCenter;
 
-		public CenterInterp(final Vector3D endCenter, final long timeInMillis) {
+		public CenterInterp(final Vector3D endCenter, final long timeInMillis)
+		{
 			super(timeInMillis);
 			this.endCenter = endCenter;
 		}
 
 		@Override
-		protected void interp(final double t) {
+		protected void interp(final double t)
+		{
 			center = InterpolationUtil.smooth(startCenter, endCenter, t);
 		}
 
 		@Override
-		protected void setEndState() {
+		protected void setEndState()
+		{
 			center = endCenter;
 		}
 	}
 
-	class RotationInterp extends AbstractInterp {
+	class RotationInterp extends AbstractInterp
+	{
 		final Rotation startRotation = rotation;
 		final Rotation endRotation;
 
-		public RotationInterp(final Rotation endRotation, final long timeInMillis) {
+		public RotationInterp(final Rotation endRotation, final long timeInMillis)
+		{
 			super(timeInMillis);
 			this.endRotation = endRotation;
 		}
 
 		@Override
-		void start() {
+		void start()
+		{
 			rotateX.stop();
 			rotateY.stop();
 			rotateZ.stop();
@@ -618,13 +740,16 @@ public class PeasyCam {
 		}
 
 		@Override
-		protected void interp(final double t) {
+		protected void interp(final double t)
+		{
 			rotation = InterpolationUtil.slerp(startRotation, endRotation, t);
 		}
 
 		@Override
-		protected void setEndState() {
+		protected void setEndState()
+		{
 			rotation = endRotation;
 		}
+
 	}
 }
