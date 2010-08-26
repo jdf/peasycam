@@ -487,33 +487,38 @@ public class PeasyCam {
 	}
 
 	public void lookThrough(final double x, final double y, final double z) {
-		double rollorientation = 90 * Math.PI / 180;
-		this.lookThrough(x, y, z, distance, 0, rollorientation);
+
+		this.lookThrough(x, y, z, distance, 0);
 	}
 
 	public void lookThrough(final double x, final double y, final double z,
 			final long animationTimeMillis) {
-		double rollorientation = 90 * Math.PI / 180;
-		this.lookThrough(x, y, z, distance, animationTimeMillis,
-				rollorientation);
+
+		this.lookThrough(x, y, z, distance, animationTimeMillis);
 	}
 
 	public void lookThrough(final double x, final double y, final double z,
 			final double distance, final long animationTimeMillis) {
-		double rollorientation = 90 * Math.PI / 180;
-		this.lookThrough(x, y, z, distance, animationTimeMillis,
-				rollorientation);
-	}
+		Vector3D CamVector = new Vector3D(x, y, z);
 
-	public void lookThrough(final double x, final double y, final double z,
-			final double distance, final long animationTimeMillis,
-			final double rollorientation) {
-		double r = Math.sqrt(y * y + x * x + z * z);
-		double yaw = Math.atan2(x, y);
-		double roll = Math.acos(-z / r) + rollorientation;
-		double pitch = -Math.PI / 2;
+		Vector3D CVY = new Vector3D(0, CamVector.getY(), CamVector.getZ());
+		Vector3D CVX = new Vector3D(1, 0, 0);
+		Vector3D CVZ = Vector3D.crossProduct(CVX, CVY);
 
-		setRotations(pitch, yaw, roll, distance, animationTimeMillis);
+		CVX = CVX.normalize();
+		CVY = CVY.normalize();
+		CVZ = CVZ.normalize();
+
+		Vector3D PV = new Vector3D(Vector3D.dotProduct(CVX, CamVector),
+				Vector3D.dotProduct(CVY, CamVector), Vector3D.dotProduct(CVZ,
+						CamVector));
+
+		double pitch = Math.atan2(CamVector.getZ(), CamVector.getY()) - Math.PI
+				/ 2;
+		double yaw = Math.atan2(PV.getX(), PV.getY());
+		double roll = 0;
+
+		this.setRotations(pitch, yaw, roll, distance, animationTimeMillis);
 	}
 
 	public void setRotations(final double pitch, final double yaw,
