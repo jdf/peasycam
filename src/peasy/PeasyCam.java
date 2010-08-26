@@ -541,6 +541,11 @@ public class PeasyCam {
 	}
 
 	public void setRotations(final double pitch, final double yaw,
+			final double roll, final long animationTimeMillis) {
+		this.setRotations(pitch, yaw, roll, distance, animationTimeMillis);
+	}
+
+	public void setRotations(final double pitch, final double yaw,
 			final double roll) {
 		this.setRotations(pitch, yaw, roll, distance, 0);
 	}
