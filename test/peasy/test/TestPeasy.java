@@ -13,6 +13,7 @@ public class TestPeasy extends PApplet {
 		cam = new PeasyCam(this, 100);
 		cam.setMinimumDistance(50);
 		cam.setMaximumDistance(500);
+		cam.setWheelScale(4.0);
 	}
 
 	public void draw() {
