@@ -502,7 +502,7 @@ public class PeasyCam {
 		Vector3D CamVector = new Vector3D(x, y, z);
 
 		Vector3D CVY = new Vector3D(0, CamVector.getY(), CamVector.getZ());
-		Vector3D CVX = new Vector3D(1, 0, 0);
+		Vector3D CVX = Vector3D.plusI;
 		Vector3D CVZ = Vector3D.crossProduct(CVX, CVY);
 
 		CVX = CVX.normalize();
