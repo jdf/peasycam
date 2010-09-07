@@ -481,11 +481,70 @@ public class PeasyCam {
 		feed();
 	}
 
-	public void setRotations(final double pitch, final double yaw, final double roll) {
+	public void lookThrough(final double x, final double y, final double z) {
+
+		this.lookThrough(x, y, z, distance, 0);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final long animationTimeMillis) {
+
+		this.lookThrough(x, y, z, distance, animationTimeMillis);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final double distance, final long animationTimeMillis) {
+		Vector3D CamVector = new Vector3D(x, y, z);
+
+		Vector3D CVY = new Vector3D(0, CamVector.getY(), CamVector.getZ());
+		Vector3D CVX = Vector3D.plusI;
+		Vector3D CVZ = Vector3D.crossProduct(CVX, CVY);
+
+		CVX = CVX.normalize();
+		CVY = CVY.normalize();
+		CVZ = CVZ.normalize();
+
+		Vector3D PV = new Vector3D(Vector3D.dotProduct(CVX, CamVector),
+				Vector3D.dotProduct(CVY, CamVector), Vector3D.dotProduct(CVZ,
+						CamVector));
+
+		double pitch = Math.atan2(CamVector.getZ(), CamVector.getY()) - Math.PI
+				/ 2;
+		double yaw = Math.atan2(PV.getX(), PV.getY());
+		double roll = 0;
+
+		this.setRotations(pitch, yaw, roll, distance, animationTimeMillis);
+	}
+
+	public void setRotations(final double pitch, final double yaw,
+			final double roll, final double distance,
+			final long animationTimeMillis) {
+
 		rotationInterps.cancelInterpolation();
-		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		if (animationTimeMillis > 0) {
+			Rotation rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+
+			rotationInterps.startInterpolation(new RotationInterp(rotation,
+					animationTimeMillis));
+			distanceInterps.startInterpolation(new DistanceInterp(distance,
+					animationTimeMillis));
+		} else {
+			this.distance = distance;
+			this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		}
 		feed();
 	}
+
+	public void setRotations(final double pitch, final double yaw,
+			final double roll, final long animationTimeMillis) {
+		this.setRotations(pitch, yaw, roll, distance, animationTimeMillis);
+	}
+
+	public void setRotations(final double pitch, final double yaw,
+			final double roll) {
+		this.setRotations(pitch, yaw, roll, distance, 0);
+	}
+
 
 	/**
 	 * Express the current camera rotation as an equivalent series
