@@ -96,6 +96,10 @@ public class PeasyCam {
 	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
 	private double wheelScale = 1.0;
 
+	private final PeasyMouseListener mouseListener = new PeasyMouseListener();
+	private final PeasyMousewheelListener mouseWheelListener = new PeasyMousewheelListener();
+	private boolean isActive = false;
+
 	private final PMatrix3D originalMatrix; // for HUD restore
 
 	public final String VERSION = "0.9";
@@ -156,11 +160,24 @@ public class PeasyCam {
 			}
 		};
 
-		final PeasyMouseListener mouseListener = new PeasyMouseListener();
-		p.registerMouseEvent(mouseListener);
-		p.registerKeyEvent(mouseListener);
-		p.addMouseWheelListener(new PeasyMousewheelListener());
+		setActive(true);
 		System.err.println("PeasyCam v" + VERSION);
+	}
+
+	public void setActive(final boolean active) {
+		if (active == isActive) {
+			return;
+		}
+		isActive = active;
+		if (isActive) {
+			p.registerMouseEvent(mouseListener);
+			p.registerKeyEvent(mouseListener);
+			p.addMouseWheelListener(mouseWheelListener);
+		} else {
+			p.unregisterMouseEvent(mouseListener);
+			p.unregisterKeyEvent(mouseListener);
+			p.removeMouseWheelListener(mouseWheelListener);
+		}
 	}
 
 	/**

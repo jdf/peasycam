@@ -28,4 +28,9 @@ public class TestPeasy extends PApplet {
 		box(5);
 		popMatrix();
 	}
+
+	@Override
+	public void keyPressed() {
+		cam.setActive(key == 'a');
+	}
 }
