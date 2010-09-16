@@ -180,6 +180,10 @@ public class PeasyCam {
 		}
 	}
 
+	public boolean isActive() {
+		return isActive;
+	}
+	
 	/**
 	 * <p>
 	 * Turn on or off default mouse-handling behavior:
