@@ -25,7 +25,7 @@ PeasyCam(PApplet parent, double distance); // look at 0,0,0</pre>
 
 h3. Methods
 
-<pre>camera.setMouseControlled(boolean isMouseControlled);  // default true
+<pre>camera.setActive(boolean active);  // false to make this camera stop responding to mouse
 
 // reassign particular drag gestures, or set them to null
 camera.setLeftDragHandler(PeasyDragHandler handler);

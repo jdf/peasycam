@@ -102,7 +102,7 @@ public class PeasyCam {
 
 	private final PMatrix3D originalMatrix; // for HUD restore
 
-	public final String VERSION = "0.9";
+	public final String VERSION = "0.91";
 
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, 0, 0, 0, distance);
@@ -209,19 +209,10 @@ public class PeasyCam {
 	 * </table>
 	 * 
 	 * @param isMouseControlled
+	 * @deprecated use {@link #setActive(boolean)}
 	 */
 	public void setMouseControlled(final boolean isMouseControlled) {
-		if (isMouseControlled) {
-			leftDragHandler = rotateHandler;
-			rightDraghandler = zoomHandler;
-			centerDragHandler = panHandler;
-			wheelHandler = zoomWheelHandler;
-		} else {
-			leftDragHandler = null;
-			rightDraghandler = null;
-			centerDragHandler = null;
-			wheelHandler = null;
-		}
+		setActive(isMouseControlled);
 	}
 
 	public double getWheelScale() {
