@@ -214,9 +214,15 @@ PeasyDragHandler getZoomDragHandler();
 camera.setWheelHandler(PeasyWheelHandler handler);
 PeasyWheelHandler getZoomWheelHandler();
 
-// change sensitivity of built-in mouse wheel zoom
+// change sensitivity of built-in mouse controls
 camera.setWheelScale(double scale); // 1.0 by default
 double getWheelScale();
+camera.setZoomScale(double scale); // 1.0 by default
+double getZoomScale();
+camera.setRotationScale(double scale); // 1.0 by default
+double getRotationScale();
+camera.setPanScale(double scale); // 1.0 by default
+double getPanScale();
 
 // make your own!
 public interface PeasyDragHandler {
