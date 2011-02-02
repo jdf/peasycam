@@ -62,5 +62,9 @@ abstract public class DampedAction {
 		velocity = 0;
 	}
 
+	public double getVelocity() {
+		return velocity;
+	}
+
 	abstract protected void behave(final double velocity);
 }
