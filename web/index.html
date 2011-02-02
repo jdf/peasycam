@@ -253,6 +253,8 @@ camera.setMaximumDistance(double maximumDistance);  // clamp zooming
 camera.reset();
 camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
 
+camera.isMoving();  // returns true or false
+
 CameraState state = camera.getState(); // get a serializable settings object for current state
 camera.setState(CameraState state);
 camera.setState(CameraState state, long animationTimeInMillis); // set the camera to the given saved state
