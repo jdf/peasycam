@@ -503,11 +503,12 @@ public class PeasyCam {
 	public boolean isMoving() {
 	   if (rotateX.getVelocity() == 0 && rotateY.getVelocity() == 0 && 
 			   rotateZ.getVelocity() == 0 && dampedZoom.getVelocity() == 0 && 
-			   dampedPanX.getVelocity() == 0 && dampedPanY.getVelocity() == 0) {
+			   dampedPanX.getVelocity() == 0 && dampedPanY.getVelocity() == 0 &&
+			   distanceInterps.isStopped() && centerInterps.isStopped()  && rotationInterps.isStopped() ) {
 		   return false;
-	   } else {
-		   return true;
-	   }
+	   } 
+	   
+	   return true;
 	}
 
 	public void setState(final CameraState state) {
@@ -587,18 +588,26 @@ public class PeasyCam {
 	abstract public class AbstractInterp {
 		double startTime;
 		final double timeInMillis;
+		boolean stopped;
 
 		protected AbstractInterp(final long timeInMillis) {
 			this.timeInMillis = timeInMillis;
+			this.stopped = true;
 		}
 
 		void start() {
 			startTime = p.millis();
 			p.registerDraw(this);
+			this.stopped = false;
 		}
 
 		void cancel() {
 			p.unregisterDraw(this);
+			this.stopped = true;
+		}
+		
+		boolean isStopped() {
+			return this.stopped;
 		}
 
 		public void draw() {
