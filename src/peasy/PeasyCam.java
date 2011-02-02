@@ -500,6 +500,16 @@ public class PeasyCam {
 		this.resetOnDoubleClick = resetOnDoubleClick;
 	}
 
+	public boolean isMoving() {
+	   if (rotateX.getVelocity() == 0 && rotateY.getVelocity() == 0 && 
+			   rotateZ.getVelocity() == 0 && dampedZoom.getVelocity() == 0 && 
+			   dampedPanX.getVelocity() == 0 && dampedPanY.getVelocity() == 0) {
+		   return false;
+	   } else {
+		   return true;
+	   }
+	}
+
 	public void setState(final CameraState state) {
 		setState(state, 300);
 	}
