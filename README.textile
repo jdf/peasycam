@@ -56,6 +56,8 @@ public interface PeasyDragHandler {
 public interface PeasyWheelHandler {
 	public void handleWheel(final int delta);
 }
+camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
+camera.setPanOnScreenEdge(boolean panOnScreenEdge); // default false
 
 camera.lookAt(double x, double y, double z);
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
