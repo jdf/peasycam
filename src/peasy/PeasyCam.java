@@ -503,10 +503,6 @@ public class PeasyCam {
 		this.resetOnDoubleClick = resetOnDoubleClick;
 	}
 
-	public boolean getPanOnScreenEdge() {
-		return this.panOnScreenEdge;
-	}
-
 	public void setPanOnScreenEdge(final boolean panOnScreenEdge) {
 		if (panOnScreenEdge) {
 			edgepan = new EdgeMonitor();
