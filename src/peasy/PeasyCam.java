@@ -72,10 +72,10 @@ public class PeasyCam {
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
 	private final PeasyDragHandler panHandler /* ha ha ha */= new PeasyDragHandler() {
-        public void handleDrag(final double dx, final double dy) {
-            dampedPanX.impulse(panScale * dx / 8.);
-            dampedPanY.impulse(panScale * dy / 8.);
-        }
+		public void handleDrag(final double dx, final double dy) {
+			dampedPanX.impulse(panScale * dx / 8.);
+			dampedPanY.impulse(panScale * dy / 8.);
+		}
 	};
 	private PeasyDragHandler centerDragHandler = panHandler;
 
@@ -87,16 +87,16 @@ public class PeasyCam {
 	private PeasyDragHandler leftDragHandler = rotateHandler;
 
 	private final PeasyDragHandler zoomHandler = new PeasyDragHandler() {
-        public void handleDrag(final double dx, final double dy) {
-            dampedZoom.impulse(zoomScale * dy / 10.0);
-        }
+		public void handleDrag(final double dx, final double dy) {
+			dampedZoom.impulse(zoomScale * dy / 10.0);
+		}
 	};
 	private PeasyDragHandler rightDraghandler = zoomHandler;
 
 	private final PeasyWheelHandler zoomWheelHandler = new PeasyWheelHandler() {
-        public void handleWheel(final int delta) {
-            dampedZoom.impulse(zoomScale * wheelScale * delta);
-        }
+		public void handleWheel(final int delta) {
+			dampedZoom.impulse(zoomScale * wheelScale * delta);
+		}
 	};
 	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
 	private double wheelScale = 1.0;
@@ -360,32 +360,31 @@ public class PeasyCam {
 	}
 
 	private void mouseRotate(final double dx, final double dy) {
-        final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
+		final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
+		if (dragConstraint != Constraint.X) {
+			final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
+			final double adz = Math.abs(dy) * rho;
+			final double ady = Math.abs(dy) * (1 - rho);
+			final int ySign = dy < 0 ? -1 : 1;
+			final Vector3D vy = u.add(new Vector3D(0, ady, 0));
+			rotateX.impulse(Vector3D.angle(u, vy) * ySign * rotateScale);
+			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
+			rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
+					* (p.mouseX < p.width / 2 ? -1 : 1) * rotateScale);
+		}
 
-        if (dragConstraint != Constraint.X) {
-            final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
-            final double adz = Math.abs(dy) * rho;
-            final double ady = Math.abs(dy) * (1 - rho);
-            final int ySign = dy < 0 ? -1 : 1;
-            final Vector3D vy = u.add(new Vector3D(0, ady, 0));
-            rotateX.impulse(Vector3D.angle(u, vy) * ySign * rotateScale);
-            final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-            rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-                    * (p.mouseX < p.width / 2 ? -1 : 1) * rotateScale);
-        }
-
-        if (dragConstraint != Constraint.Y) {
-            final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
-                    / (p.height / 2d);
-            final int xSign = dx > 0 ? -1 : 1;
-            final double adz = Math.abs(dx) * eccentricity;
-            final double adx = Math.abs(dx) * (1 - eccentricity);
-            final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
-            rotateY.impulse(Vector3D.angle(u, vx) * xSign * rotateScale);
-            final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-            rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-                    * (p.mouseY > p.height / 2 ? -1 : 1) * rotateScale);
-        }
+		if (dragConstraint != Constraint.Y) {
+			final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
+					/ (p.height / 2d);
+			final int xSign = dx > 0 ? -1 : 1;
+			final double adz = Math.abs(dx) * eccentricity;
+			final double adx = Math.abs(dx) * (1 - eccentricity);
+			final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
+			rotateY.impulse(Vector3D.angle(u, vx) * xSign * rotateScale);
+			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
+			rotateZ.impulse(Vector3D.angle(u, vz) * xSign
+					* (p.mouseY > p.height / 2 ? -1 : 1) * rotateScale);
+		}
 	}
 
 	public double getDistance() {
