@@ -53,6 +53,8 @@ public class PeasyCam {
 
 	private boolean resetOnDoubleClick = true;
 	private EdgeMonitor edgepan;
+	private boolean mouseIsOverSketch;
+	private Point mouseExit;
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
 
@@ -337,6 +339,11 @@ public class PeasyCam {
 				} else if (rightDraghandler != null && b == PConstants.RIGHT) {
 					rightDraghandler.handleDrag(dx, dy);
 				}
+			} else if (e.getID() == MouseEvent.MOUSE_EXITED) {
+				mouseIsOverSketch = false;
+				mouseExit = e.getPoint();
+			} else if (e.getID() == MouseEvent.MOUSE_ENTERED) {
+				mouseIsOverSketch = true;
 			}
 		}
 
@@ -609,6 +616,7 @@ public class PeasyCam {
 		*/
 
 		EdgeMonitor() {
+			mouseIsOverSketch = true;
 			p.registerDraw(this);
 		}
 
@@ -618,52 +626,79 @@ public class PeasyCam {
 
 		public void draw() {
 
-			/*
-			* Only run if the frame has focus or is not visible (FullScreen
-			* library)
-			*/
-			
-			if (p.frame.isFocused() || !p.frame.isVisible()) {
-				this.mouse = MouseInfo.getPointerInfo().getLocation();
+			if (!p.online) {
+				/*
+				 * Only run if the frame has focus or is not visible (FullScreen
+				 * library)
+				 */
+				if (p.frame.isFocused() || !p.frame.isVisible()) {
 
-				if (p.frame.isVisible()) {
-					this.xpos = p.frame.getBounds().x;
-					this.ypos = p.frame.getBounds().y;
-					if (p.frame.isUndecorated()) {
-						this.ydelta = (p.frame.getBounds().height - p.height)/2;
-						this.xdelta = (p.frame.getBounds().width - p.width)/2;
+					this.mouse = MouseInfo.getPointerInfo().getLocation();
+
+					if (p.frame.isVisible()) {
+						this.xpos = p.frame.getBounds().x;
+						this.ypos = p.frame.getBounds().y;
+						if (p.frame.isUndecorated()) {
+							this.ydelta = (p.frame.getBounds().height - p.height) / 2;
+							this.xdelta = (p.frame.getBounds().width - p.width) / 2;
+						} else {
+							this.ydelta = p.frame.getBounds().height - p.height;
+							this.xdelta = p.frame.getBounds().width - p.width;
+						}
 					} else {
-						this.ydelta = p.frame.getBounds().height - p.height;
-						this.xdelta = p.frame.getBounds().width - p.width;
+						this.xpos = 0;
+						this.ypos = 0;
+						this.ydelta = 0;
+						this.xdelta = 0;
 					}
-				} else {
-					this.xpos = 0;
-					this.ypos = 0;
-					this.ydelta = 0;
-					this.xdelta = 0;
-				}
 
-				this.left = this.xpos + this.xdelta;
-				this.top = this.ypos + this.ydelta;
-				this.right = this.left + p.width - 1;
-				this.bottom = this.top + p.height - 1;
-			
-				if (mouse.x <= this.left || mouse.x >= this.right || mouse.y <= this.top
-						|| mouse.y >= this.bottom) {
-				
+					this.left = this.xpos + this.xdelta;
+					this.top = this.ypos + this.ydelta;
+					this.right = this.left + p.width - 1;
+					this.bottom = this.top + p.height - 1;
+
+					if (mouse.x <= this.left || mouse.x >= this.right
+							|| mouse.y <= this.top || mouse.y >= this.bottom) {
+
+						double dx = 0;
+						double dy = 0;
+
+						if (mouse.x <= this.left) {
+							dx = -8;
+						} else if (mouse.x >= this.right) {
+							dx = 8;
+						}
+						if (mouse.y <= this.top) {
+							dy = -8;
+						} else if (mouse.y >= this.bottom) {
+							dy = 8;
+						}
+						panHandler.handleDrag(dx, dy);
+					}
+				}
+			} else {
+				if (!mouseIsOverSketch) {
+
 					double dx = 0;
 					double dy = 0;
 
-					if ( mouse.x <= this.left) {
+					/*
+					 * Runs only if in applet and the mouse is off-screen.
+					 * mouseExit is more accurate than p.mouseX and p.mouseY for
+					 * the screen edge - attempt to determine exit location
+					 */
+
+					if (mouseExit.x <= 1) {
 						dx = -8;
-					} else if ( mouse.x >= this.right) {
+					} else if (mouseExit.x >= p.width - 1) {
 						dx = 8;
 					}
-					if ( mouse.y <= this.top) {
+					if (mouseExit.y <= 1) {
 						dy = -8;
-					} else if ( mouse.y >= this.bottom) {
+					} else if (mouseExit.y >= p.height - 1) {
 						dy = 8;
 					}
+
 					panHandler.handleDrag(dx, dy);
 				}
 			}
