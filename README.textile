@@ -1,4 +1,5 @@
 PeasyCam provides a dead-simple mouse-driven camera for Processing. It is created and maintained by "Jonathan Feinberg":http://mrfeinberg.com/. It is free for all uses, per the Apache 2.0 license.
+PeasyCam provides a dead-simple mouse-driven camera for Processing. It is created and maintained by "Jonathan Feinberg":http://mrfeinberg.com/. It is free for all uses, per the Apache 2.0 license.
 
 To download the distribution, and to see a demo, go to "the PeasyCam home page":http://mrfeinberg.com/peasycam/.
 
@@ -39,15 +40,9 @@ PeasyDragHandler getZoomDragHandler();
 camera.setWheelHandler(PeasyWheelHandler handler);
 PeasyWheelHandler getZoomWheelHandler();
 
-// change sensitivity of built-in mouse controls
+// change sensitivity of built-in mouse wheel zoom
 camera.setWheelScale(double scale); // 1.0 by default
-camera.setZoomScale(double scale); // 1.0 by default
-camera.setRotationScale(double scale); // 1.0 by default
-camera.setPanScale(double scale); // 1.0 by default
 double getWheelScale();
-double getZoomScale();
-double getRotationScale();
-double getPanScale();
 
 // make your own!
 public interface PeasyDragHandler {
@@ -56,8 +51,6 @@ public interface PeasyDragHandler {
 public interface PeasyWheelHandler {
 	public void handleWheel(final int delta);
 }
-camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
-camera.setPanOnScreenEdge(boolean panOnScreenEdge); // default false
 
 camera.lookAt(double x, double y, double z);
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
@@ -68,8 +61,6 @@ camera.pan(double dx, double dy);     // move the looked-at point relative to cu
 
 camera.reset();
 camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
-
-camera.isMoving();  // returns true or false
 
 CameraState state = camera.getState(); // get a serializable settings object for current state
 camera.setState(CameraState state);
