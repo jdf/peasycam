@@ -510,7 +510,7 @@ public class PeasyCam {
 	}
 
 	public void setPanOnScreenEdge(final boolean panOnScreenEdge) {
-		if (panOnScreenEdge) {
+		if (panOnScreenEdge && edgepan == null) {
 			edgepan = new EdgeMonitor();
 		} else if (edgepan != null) {
 			edgepan.cancel();
