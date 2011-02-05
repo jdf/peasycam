@@ -518,15 +518,43 @@ public class PeasyCam {
 		}
 	}
 
+	public double getVelocity() {
+		double[] maxvelocity = { rotateX.getVelocity(), rotateY.getVelocity(),
+				rotateZ.getVelocity(), dampedZoom.getVelocity(),
+				dampedPanX.getVelocity(), dampedPanY.getVelocity() };
+		
+		double max = maxvelocity[0];
+		for (int i = 1; i < maxvelocity.length; ++i) {
+			if (maxvelocity[i] > max) {
+				max = maxvelocity[i];
+			}
+		}
+		return max;
+	}
+
+	public double getTimeRemaining() {
+		double[] maxtime = { distanceInterps.timeRemaining(),
+				centerInterps.timeRemaining(), rotationInterps.timeRemaining() };
+		double max = maxtime[0];
+		for (int i = 1; i < maxtime.length; ++i) {
+			if (maxtime[i] > max) {
+				max = maxtime[i];
+			}
+		}
+		return max;
+	}
+
 	public boolean isMoving() {
-	   if (rotateX.getVelocity() == 0 && rotateY.getVelocity() == 0 && 
-			   rotateZ.getVelocity() == 0 && dampedZoom.getVelocity() == 0 && 
-			   dampedPanX.getVelocity() == 0 && dampedPanY.getVelocity() == 0 &&
-			   distanceInterps.isStopped() && centerInterps.isStopped()  && rotationInterps.isStopped() ) {
-		   return false;
-	   } 
-	   
-	   return true;
+		if (rotateX.getVelocity() == 0 && rotateY.getVelocity() == 0
+				&& rotateZ.getVelocity() == 0 && dampedZoom.getVelocity() == 0
+				&& dampedPanX.getVelocity() == 0
+				&& dampedPanY.getVelocity() == 0
+				&& distanceInterps.timeRemaining() == 0
+				&& centerInterps.timeRemaining() == 0
+				&& rotationInterps.timeRemaining() == 0) {
+			return false;
+		}
+		return true;
 	}
 
 	public void setState(final CameraState state) {
@@ -707,26 +735,18 @@ public class PeasyCam {
 	abstract public class AbstractInterp {
 		double startTime;
 		final double timeInMillis;
-		boolean stopped;
 
 		protected AbstractInterp(final long timeInMillis) {
 			this.timeInMillis = timeInMillis;
-			this.stopped = true;
 		}
 
 		void start() {
 			startTime = p.millis();
 			p.registerDraw(this);
-			this.stopped = false;
 		}
 
 		void cancel() {
 			p.unregisterDraw(this);
-			this.stopped = true;
-		}
-		
-		boolean isStopped() {
-			return this.stopped;
 		}
 
 		public void draw() {
