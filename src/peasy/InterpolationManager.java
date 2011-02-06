@@ -23,7 +23,7 @@ class InterpolationManager {
 
 	double timeRemaining() {
 		if (currentInterpolator != null) {
-			return currentInterpolator.timeInMillis;
+			return currentInterpolator.timeRemaining;
 		}
 		return 0;
 	}
