@@ -735,6 +735,7 @@ public class PeasyCam {
 	abstract public class AbstractInterp {
 		double startTime;
 		final double timeInMillis;
+		double timeRemaining;
 
 		protected AbstractInterp(final long timeInMillis) {
 			this.timeInMillis = timeInMillis;
@@ -750,16 +751,17 @@ public class PeasyCam {
 		}
 
 		public void draw() {
-			final double t = (p.millis() - startTime) / timeInMillis;
-			if (t > .99) {
+			timeRemaining = (p.millis() - startTime) / timeInMillis;
+			if (timeRemaining > .99) {
+				timeRemaining = 0;
 				cancel();
 				setEndState();
 			} else {
-				interp(t);
+				interp(timeRemaining);
 			}
 			feed();
-		}
-
+		}	
+		
 		protected abstract void interp(double t);
 
 		protected abstract void setEndState();
