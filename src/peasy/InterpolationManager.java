@@ -21,10 +21,10 @@ class InterpolationManager {
 		}
 	}
 
-	double timeRemaining() {
+	boolean isStopped() {
 		if (currentInterpolator != null) {
-			return currentInterpolator.timeRemaining;
+			return currentInterpolator.isStopped();
 		}
-		return 0;
+		return true;
 	}
 }
