@@ -59,6 +59,15 @@ camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
 camera.setPanOnScreenEdge(boolean panOnScreenEdge); // default false
 
 camera.lookAt(double x, double y, double z);
+camera.lookAt(double x, double y, double z, long animationTimeInMillis);
+camera.lookAt(double x, double y, double z, double distance);
+camera.lookAt(double x, double y, double z, double distance, long animationTimeInMillis);
+
+camera.lookThrough(double x, double y, double z);
+camera.lookThrough(double x, double y, double z, long animationTimeInMillis);
+camera.lookThrough(double x, double y, double z, double distance);
+camera.lookThrough(double x, double y, double z, double distance, long animationTimeInMillis);
+
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
 camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
 camera.rotateZ(double angle);  // rotate around the z-axis passing through the subject
