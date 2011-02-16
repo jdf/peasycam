@@ -262,6 +262,7 @@ camera.setState(CameraState state, long animationTimeInMillis); // set the camer
 
 float[] rotations = camera.getRotations(); // x, y, and z rotations required to face camera in model space
 camera.setRotations(double pitch, double yaw, double roll); // rotations are applied in that order
+camera.setRotations(double pitch, double yaw, double roll, long animationTimeInMillis);
 float[] position = camera.getPosition(); // x, y, and z coordinates of camera in model space
 
 // Utility methods to permit the use of a Heads-Up Display
