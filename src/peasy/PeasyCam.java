@@ -563,9 +563,20 @@ public class PeasyCam {
 		feed();
 	}
 
-	public void setRotations(final double pitch, final double yaw, final double roll) {
+	public void setRotations(final double pitch, final double yaw,
+			final double roll) {
+		setRotations(pitch, yaw, roll, 0);
+	}
+
+	public void setRotations(final double pitch, final double yaw,
+			final double roll, final long animationTimeMillis) {
 		rotationInterps.cancelInterpolation();
-		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		if (animationTimeMillis > 0) {
+			rotationInterps.startInterpolation(new RotationInterp(new Rotation(
+					RotationOrder.XYZ, pitch, yaw, roll), animationTimeMillis));
+		} else {
+			this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		}
 		feed();
 	}
 
