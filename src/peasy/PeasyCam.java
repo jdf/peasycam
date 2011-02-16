@@ -426,6 +426,45 @@ public class PeasyCam {
 				animationTimeMillis);
 	}
 
+	public void lookThrough(final double x, final double y, final double z) {
+		lookThrough(x, y, z, distance, 0);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final double distance) {
+		lookThrough(x, y, z, distance, 0);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final long animationTimeMillis) {
+		lookThrough(x, y, z, distance, animationTimeMillis);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final double distance, final long animationTimeMillis) {
+
+		  Vector3D CamVector = new Vector3D(x,y,z);
+		  
+		  Vector3D CVY = new Vector3D(0, CamVector.getY(), CamVector.getZ());
+		  Vector3D CVX = new Vector3D(1,0,0);
+		  Vector3D CVZ = Vector3D.crossProduct(CVX,CVY);
+		
+		  CVX = CVX.normalize();
+		  CVY = CVY.normalize();
+		  CVZ = CVZ.normalize();
+
+		  Vector3D PV = new Vector3D( Vector3D.dotProduct(CVX, CamVector)
+		                          , Vector3D.dotProduct(CVY,CamVector )
+		                          , Vector3D.dotProduct(CVZ, CamVector ));
+
+		  double pitch = Math.atan2( CamVector.getZ(), CamVector.getY() ) - (Math.PI*.5);
+		  double yaw   = Math.atan2( PV.getX(), PV.getY() );
+		  double roll  = 0;
+		  
+		setDistance(distance, animationTimeMillis);
+		setRotations(pitch, yaw, roll, animationTimeMillis);
+	}
+
 	private void safeSetDistance(final double distance) {
 		this.distance = Math.min(maximumDistance, Math.max(minimumDistance, distance));
 		feed();
