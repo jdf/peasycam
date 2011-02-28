@@ -549,8 +549,12 @@ public class PeasyCam {
 	}
 
 	public void setPanOnScreenEdge(final boolean panOnScreenEdge) {
+		setPanOnScreenEdge(panOnScreenEdge, false);
+	}
+	
+	public void setPanOnScreenEdge(final boolean panOnScreenEdge, final boolean panEdgeReverse){	
 		if (panOnScreenEdge && edgepan == null) {
-			edgepan = new EdgeMonitor();
+			edgepan = new EdgeMonitor(panEdgeReverse);
 		} else if (!panOnScreenEdge && edgepan != null) {
 			edgepan.cancel();
 			edgepan = null;
@@ -670,7 +674,8 @@ public class PeasyCam {
 	public class EdgeMonitor {
 		int left, right, top, bottom, xpos, ypos, ydelta, xdelta;
 		Point mouse;
-		
+		boolean reverse;
+
 		/*
 		* Draw registration is needed as the MouseEvent for mouseChange does
 		* not detect mouse movement after the mouse leaves the frame space. We
@@ -678,8 +683,9 @@ public class PeasyCam {
 		* beyond this area.
 		*/
 
-		EdgeMonitor() {
+		EdgeMonitor(boolean reverse) {
 			mouseIsOverSketch = true;
+			this.reverse = reverse;
 			p.registerDraw(this);
 		}
 
@@ -736,6 +742,10 @@ public class PeasyCam {
 						} else if (mouse.y >= this.bottom) {
 							dy = 8;
 						}
+						if (reverse) {
+							dy = dy*-1;
+							dx = dx*-1;
+						}
 						panHandler.handleDrag(dx, dy);
 					}
 				}
@@ -761,7 +771,10 @@ public class PeasyCam {
 					} else if (mouseExit.y >= p.height - 1) {
 						dy = 8;
 					}
-
+					if (reverse) {
+						dy = dy*-1;
+						dx = dx*-1;
+					}
 					panHandler.handleDrag(dx, dy);
 				}
 			}
