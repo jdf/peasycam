@@ -233,6 +233,7 @@ public interface PeasyWheelHandler {
 }
 camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
 camera.setPanOnScreenEdge(boolean panOnScreenEdge); // default false
+camera.setPanOnScreenEdge(boolean panOnScreenEdge, boolean panEdgeReverse);  //reverses pan direction when true
 
 camera.lookAt(double x, double y, double z);
 camera.lookAt(double x, double y, double z, long animationTimeInMillis);
