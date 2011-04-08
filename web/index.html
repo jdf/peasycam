@@ -256,6 +256,8 @@ float[] camera.getLookAt();  // float[] { x, y, z }, looked-at point
 
 camera.setMinimumDistance(double minimumDistance);
 camera.setMaximumDistance(double maximumDistance);  // clamp zooming
+camera.getMinimumDistance();
+camera.getMaximumDistance();
 
 camera.reset();
 camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
