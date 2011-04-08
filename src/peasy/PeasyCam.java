@@ -534,6 +534,14 @@ public class PeasyCam {
 		return new CameraState(rotation, center, distance);
 	}
 
+	public double getMinimumDistance() {
+		return minimumDistance;
+	}
+	
+	public double getMaximumDistance() {
+		return maximumDistance;
+	}
+
 	public void setMinimumDistance(final double minimumDistance) {
 		this.minimumDistance = minimumDistance;
 		safeSetDistance(distance);
