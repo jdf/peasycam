@@ -43,7 +43,7 @@ abstract public class DampedAction {
 	}
 
 	public void impulse(final double impulse) {
-		velocity += impulse;
+		velocity += impulse*(60/p.getApplet().frameRate);
 	}
 
 	public void draw() {
