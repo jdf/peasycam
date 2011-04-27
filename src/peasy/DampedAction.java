@@ -43,6 +43,10 @@ abstract public class DampedAction {
 	}
 
 	public void impulse(final double impulse) {
+		/*
+		Preference would be to use p.getApplet().frameRateTarget instead of 60
+		Submitted as issue 652 on Processing Code - Make frameRateTarget public
+		 */
 		velocity += impulse*(60/p.getApplet().frameRate);
 	}
 
