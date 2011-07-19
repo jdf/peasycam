@@ -2,4 +2,7 @@ PeasyCam.jar
 distribution
 bin
 examples/*/applet
+web/peasycam.jar
 reference
+*.swp
+

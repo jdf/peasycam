@@ -1,13 +1,11 @@
-<project name="processingLibs" default="build" basedir="../">
+<project name="processingLibs" default="build">
 
 	<description>
        PeasyCam build
     </description>
 
-	<property name="processing" 
-		location="C:/Documents and Settings/Administrator/Desktop/processing/processing-1.2.1" />
-	<property name="processingLibraries" 
-		location="C:/Documents and Settings/Administrator/My Documents/Processing/libraries" />
+	<property name="processing" location="../processing-1.5.1" />
+	<property name="processingLibraries" location="../sketchbook/libraries" />
 
 	<property name="libraryClasspath" location="${processing}/lib" />
 	<path id="library-classpath">
@@ -19,13 +17,13 @@
 	<property name="javaVersion" value="1.5" />
 
 	<property name="author" value="Jonathan Feinberg" />
-	<property name="copyright" value="(c) 2008" />
+	<property name="copyright" value="(c) 2011" />
 	<property name="libraryName" value="PeasyCam" />
-	<property name="versionNumber" value="0.91" />
+	<property name="versionNumber" value="0.92" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />
-	<property name="tested:processingVersion" value="1.2.1" />
+	<property name="tested:processingVersion" value="1.5.1" />
 	<property name="tested:dependencies" value="" />
 	<property name="source:host" value="GitHub" />
 	<property name="source:url" value="http://github.com/jdf/peasycam/" />
@@ -39,15 +37,14 @@
 			<pathelement location="./resources/code/ant-contrib-1.0b3.jar" />
 		</classpath>
 	</taskdef>
-	<property name="jarFile" value="${libraryName}.jar" />
+	<property name="jarFile" value="peasycam.jar" />
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="reference" location="reference" />
 	<property name="dist" location="distribution" />
 
-	<property name="cygwin" value="c:/cygwin/bin"/>
-	<property name="chmod" value="${cygwin}/chmod.exe"/>
-	<property name="rsync" value="${cygwin}/rsync.exe"/>
+	<property name="chmod" value="chmod"/>
+	<property name="rsync" value="rsync"/>
 		
 
 	<target name="init">
@@ -73,7 +70,7 @@
 			<arg value="*"/>
 		</exec>
 		<exec executable="${rsync}" dir="distribution/web">
-			<env key="PATH" value="${cygwin}"/>
+			<env key="PATH" value="/home/feinberg"/>
 			<arg value="-azv"/>
 			<arg value="--exclude"/>
 			<arg value=".svn/"/>
@@ -96,6 +93,7 @@
 		<echo message="bin: ${bin}"/>
 		<echo message="javaVersion: ${javaVersion}"/>
 		<echo message="library-classpath$ ${library-classpath}"/>
+                <mkdir dir="${bin}"/>
 		<javac destdir="${bin}" source="${javaVersion}">
 			<classpath>
 				<path refid="library-classpath" />
@@ -208,7 +206,7 @@
 		<mkdir dir="${dist}/web/download" />
 		<copy file="${dist}/${libraryName}_${versionNumber}.zip" todir="${dist}/web/download" />
 
-		<copy todir="${processingLibraries}/${libraryName}/reference">
+		<copy todir="${processingLibraries}/peasycam/reference">
 			<fileset dir="${reference}" />
 		</copy>
 
