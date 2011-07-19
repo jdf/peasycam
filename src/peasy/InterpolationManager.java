@@ -21,4 +21,10 @@ class InterpolationManager {
 		}
 	}
 
+	boolean isStopped() {
+		if (currentInterpolator != null) {
+			return currentInterpolator.isStopped();
+		}
+		return true;
+	}
 }

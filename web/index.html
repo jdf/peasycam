@@ -214,9 +214,15 @@ PeasyDragHandler getZoomDragHandler();
 camera.setWheelHandler(PeasyWheelHandler handler);
 PeasyWheelHandler getZoomWheelHandler();
 
-// change sensitivity of built-in mouse wheel zoom
+// change sensitivity of built-in mouse controls
 camera.setWheelScale(double scale); // 1.0 by default
+camera.setZoomScale(double scale); // 1.0 by default
+camera.setRotationScale(double scale); // 1.0 by default
+camera.setPanScale(double scale); // 1.0 by default
 double getWheelScale();
+double getZoomScale();
+double getRotationScale();
+double getPanScale();
 
 // make your own!
 public interface PeasyDragHandler {
@@ -226,11 +232,18 @@ public interface PeasyWheelHandler {
     public void handleWheel(final int delta);
 }
 camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
+camera.setPanOnScreenEdge(boolean panOnScreenEdge); // default false
+camera.setPanOnScreenEdge(boolean panOnScreenEdge, boolean panEdgeReverse);  //reverses pan direction when true
 
 camera.lookAt(double x, double y, double z);
 camera.lookAt(double x, double y, double z, long animationTimeInMillis);
 camera.lookAt(double x, double y, double z, double distance);
 camera.lookAt(double x, double y, double z, double distance, long animationTimeInMillis);
+
+camera.lookThrough(double x, double y, double z);
+camera.lookThrough(double x, double y, double z, long animationTimeInMillis);
+camera.lookThrough(double x, double y, double z, double distance);
+camera.lookThrough(double x, double y, double z, double distance, long animationTimeInMillis);
 
 camera.rotateX(double angle);  // rotate around the x-axis passing through the subject
 camera.rotateY(double angle);  // rotate around the y-axis passing through the subject
@@ -243,9 +256,13 @@ float[] camera.getLookAt();  // float[] { x, y, z }, looked-at point
 
 camera.setMinimumDistance(double minimumDistance);
 camera.setMaximumDistance(double maximumDistance);  // clamp zooming
+camera.getMinimumDistance();
+camera.getMaximumDistance();
 
 camera.reset();
 camera.reset(long animationTimeInMillis);  // reset camera to its starting settings
+
+camera.isMoving();  // returns true or false
 
 CameraState state = camera.getState(); // get a serializable settings object for current state
 camera.setState(CameraState state);
@@ -253,6 +270,7 @@ camera.setState(CameraState state, long animationTimeInMillis); // set the camer
 
 float[] rotations = camera.getRotations(); // x, y, and z rotations required to face camera in model space
 camera.setRotations(double pitch, double yaw, double roll); // rotations are applied in that order
+camera.setRotations(double pitch, double yaw, double roll, long animationTimeInMillis);
 float[] position = camera.getPosition(); // x, y, and z coordinates of camera in model space
 
 // Utility methods to permit the use of a Heads-Up Display

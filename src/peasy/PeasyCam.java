@@ -22,6 +22,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.MouseInfo;
+import java.awt.Point;
 
 import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
@@ -50,6 +52,9 @@ public class PeasyCam {
 	private final Vector3D startCenter;
 
 	private boolean resetOnDoubleClick = true;
+	private EdgeMonitor edgepan;
+	private boolean mouseIsOverSketch;
+	private Point mouseExit;
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
 
@@ -68,8 +73,8 @@ public class PeasyCam {
 
 	private final PeasyDragHandler panHandler /* ha ha ha */= new PeasyDragHandler() {
 		public void handleDrag(final double dx, final double dy) {
-			dampedPanX.impulse(dx / 8.);
-			dampedPanY.impulse(dy / 8.);
+			dampedPanX.impulse(panScale * dx / 8.);
+			dampedPanY.impulse(panScale * dy / 8.);
 		}
 	};
 	private PeasyDragHandler centerDragHandler = panHandler;
@@ -83,18 +88,21 @@ public class PeasyCam {
 
 	private final PeasyDragHandler zoomHandler = new PeasyDragHandler() {
 		public void handleDrag(final double dx, final double dy) {
-			dampedZoom.impulse(dy / 10.0);
+			dampedZoom.impulse(zoomScale * dy / 10.0);
 		}
 	};
 	private PeasyDragHandler rightDraghandler = zoomHandler;
 
 	private final PeasyWheelHandler zoomWheelHandler = new PeasyWheelHandler() {
 		public void handleWheel(final int delta) {
-			dampedZoom.impulse(wheelScale * delta);
+			dampedZoom.impulse(zoomScale * wheelScale * delta);
 		}
 	};
 	private PeasyWheelHandler wheelHandler = zoomWheelHandler;
 	private double wheelScale = 1.0;
+	private double zoomScale = 1.0;
+	private double rotateScale = 1.0;
+	private double panScale = 1.0;
 
 	private final PeasyMouseListener mouseListener = new PeasyMouseListener();
 	private final PeasyMousewheelListener mouseWheelListener = new PeasyMousewheelListener();
@@ -258,6 +266,30 @@ public class PeasyCam {
 	public void setWheelHandler(final PeasyWheelHandler wheelHandler) {
 		this.wheelHandler = wheelHandler;
 	}
+	
+	public double getZoomScale() {
+        return zoomScale;
+	}
+
+	public void setZoomScale(double zoomScale) {
+        this.zoomScale = zoomScale;
+	}
+
+	public double getPanScale() {
+        return panScale;
+	}
+
+	public void setPanScale(double panScale) {
+        this.panScale = panScale;
+	}
+
+	public double getRotationScale() {
+        return rotateScale;
+	}
+
+	public void setRotationScale(double rotateScale) {
+        this.rotateScale = rotateScale;
+	}
 
 	public String version() {
 		return VERSION;
@@ -307,6 +339,11 @@ public class PeasyCam {
 				} else if (rightDraghandler != null && b == PConstants.RIGHT) {
 					rightDraghandler.handleDrag(dx, dy);
 				}
+			} else if (e.getID() == MouseEvent.MOUSE_EXITED) {
+				mouseIsOverSketch = false;
+				mouseExit = e.getPoint();
+			} else if (e.getID() == MouseEvent.MOUSE_ENTERED) {
+				mouseIsOverSketch = true;
 			}
 		}
 
@@ -324,17 +361,16 @@ public class PeasyCam {
 
 	private void mouseRotate(final double dx, final double dy) {
 		final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
-
 		if (dragConstraint != Constraint.X) {
 			final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
 			final double adz = Math.abs(dy) * rho;
 			final double ady = Math.abs(dy) * (1 - rho);
 			final int ySign = dy < 0 ? -1 : 1;
 			final Vector3D vy = u.add(new Vector3D(0, ady, 0));
-			rotateX.impulse(Vector3D.angle(u, vy) * ySign);
+			rotateX.impulse(Vector3D.angle(u, vy) * ySign * rotateScale);
 			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 			rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-					* (p.mouseX < p.width / 2 ? -1 : 1));
+					* (p.mouseX < p.width / 2 ? -1 : 1) * rotateScale);
 		}
 
 		if (dragConstraint != Constraint.Y) {
@@ -344,10 +380,10 @@ public class PeasyCam {
 			final double adz = Math.abs(dx) * eccentricity;
 			final double adx = Math.abs(dx) * (1 - eccentricity);
 			final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
-			rotateY.impulse(Vector3D.angle(u, vx) * xSign);
+			rotateY.impulse(Vector3D.angle(u, vx) * xSign * rotateScale);
 			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 			rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-					* (p.mouseY > p.height / 2 ? -1 : 1));
+					* (p.mouseY > p.height / 2 ? -1 : 1) * rotateScale);
 		}
 	}
 
@@ -388,6 +424,45 @@ public class PeasyCam {
 			final double distance, final long animationTimeMillis) {
 		setState(new CameraState(rotation, new Vector3D(x, y, z), distance),
 				animationTimeMillis);
+	}
+
+	public void lookThrough(final double x, final double y, final double z) {
+		lookThrough(x, y, z, distance, 0);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final double distance) {
+		lookThrough(x, y, z, distance, 0);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final long animationTimeMillis) {
+		lookThrough(x, y, z, distance, animationTimeMillis);
+	}
+
+	public void lookThrough(final double x, final double y, final double z,
+			final double distance, final long animationTimeMillis) {
+
+		  Vector3D CamVector = new Vector3D(x,y,z);
+		  
+		  Vector3D CVY = new Vector3D(0, CamVector.getY(), CamVector.getZ());
+		  Vector3D CVX = new Vector3D(1,0,0);
+		  Vector3D CVZ = Vector3D.crossProduct(CVX,CVY);
+		
+		  CVX = CVX.normalize();
+		  CVY = CVY.normalize();
+		  CVZ = CVZ.normalize();
+
+		  Vector3D PV = new Vector3D( Vector3D.dotProduct(CVX, CamVector)
+		                          , Vector3D.dotProduct(CVY,CamVector )
+		                          , Vector3D.dotProduct(CVZ, CamVector ));
+
+		  double pitch = Math.atan2( CamVector.getZ(), CamVector.getY() ) - (Math.PI*.5);
+		  double yaw   = Math.atan2( PV.getX(), PV.getY() );
+		  double roll  = 0;
+		  
+		setDistance(distance, animationTimeMillis);
+		setRotations(pitch, yaw, roll, animationTimeMillis);
 	}
 
 	private void safeSetDistance(final double distance) {
@@ -459,6 +534,14 @@ public class PeasyCam {
 		return new CameraState(rotation, center, distance);
 	}
 
+	public double getMinimumDistance() {
+		return minimumDistance;
+	}
+	
+	public double getMaximumDistance() {
+		return maximumDistance;
+	}
+
 	public void setMinimumDistance(final double minimumDistance) {
 		this.minimumDistance = minimumDistance;
 		safeSetDistance(distance);
@@ -471,6 +554,44 @@ public class PeasyCam {
 
 	public void setResetOnDoubleClick(final boolean resetOnDoubleClick) {
 		this.resetOnDoubleClick = resetOnDoubleClick;
+	}
+
+	public void setPanOnScreenEdge(final boolean panOnScreenEdge) {
+		setPanOnScreenEdge(panOnScreenEdge, false);
+	}
+	
+	public void setPanOnScreenEdge(final boolean panOnScreenEdge, final boolean panEdgeReverse){	
+		if (panOnScreenEdge && edgepan == null) {
+			edgepan = new EdgeMonitor(panEdgeReverse);
+		} else if (!panOnScreenEdge && edgepan != null) {
+			edgepan.cancel();
+			edgepan = null;
+		}
+	}
+
+	public double getVelocity() {
+		double[] maxvelocity = { rotateX.getVelocity(), rotateY.getVelocity(),
+				rotateZ.getVelocity(), dampedZoom.getVelocity(),
+				dampedPanX.getVelocity(), dampedPanY.getVelocity() };
+
+		double max = maxvelocity[0];
+		for (int i = 1; i < maxvelocity.length; ++i) {
+			if (maxvelocity[i] > max) {
+				max = maxvelocity[i];
+			}
+		}
+		return max;
+	}
+
+	public boolean isMoving() {
+	   if (rotateX.getVelocity() == 0 && rotateY.getVelocity() == 0 && 
+			   rotateZ.getVelocity() == 0 && dampedZoom.getVelocity() == 0 && 
+			   dampedPanX.getVelocity() == 0 && dampedPanY.getVelocity() == 0 &&
+			   distanceInterps.isStopped() && centerInterps.isStopped()  && rotationInterps.isStopped() ) {
+		   return false;
+	   } 
+	   
+	   return true;
 	}
 
 	public void setState(final CameraState state) {
@@ -493,9 +614,20 @@ public class PeasyCam {
 		feed();
 	}
 
-	public void setRotations(final double pitch, final double yaw, final double roll) {
+	public void setRotations(final double pitch, final double yaw,
+			final double roll) {
+		setRotations(pitch, yaw, roll, 0);
+	}
+
+	public void setRotations(final double pitch, final double yaw,
+			final double roll, final long animationTimeMillis) {
 		rotationInterps.cancelInterpolation();
-		this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		if (animationTimeMillis > 0) {
+			rotationInterps.startInterpolation(new RotationInterp(new Rotation(
+					RotationOrder.XYZ, pitch, yaw, roll), animationTimeMillis));
+		} else {
+			this.rotation = new Rotation(RotationOrder.XYZ, pitch, yaw, roll);
+		}
 		feed();
 	}
 
@@ -547,21 +679,139 @@ public class PeasyCam {
 		p.popMatrix();
 	}
 
-	abstract public class AbstractInterp {
-		double startTime;
-		final double timeInMillis;
+	public class EdgeMonitor {
+		int left, right, top, bottom, xpos, ypos, ydelta, xdelta;
+		Point mouse;
+		boolean reverse;
 
-		protected AbstractInterp(final long timeInMillis) {
-			this.timeInMillis = timeInMillis;
-		}
+		/*
+		* Draw registration is needed as the MouseEvent for mouseChange does
+		* not detect mouse movement after the mouse leaves the frame space. We
+		* need to watch the outside of the frame to determine if the mouse goes
+		* beyond this area.
+		*/
 
-		void start() {
-			startTime = p.millis();
+		EdgeMonitor(boolean reverse) {
+			mouseIsOverSketch = true;
+			this.reverse = reverse;
 			p.registerDraw(this);
 		}
 
 		void cancel() {
 			p.unregisterDraw(this);
+		}
+
+		public void draw() {
+
+			if (!p.online) {
+				/*
+				 * Only run if the frame has focus or is not visible (FullScreen
+				 * library)
+				 */
+				if (p.frame.isFocused() || !p.frame.isVisible()) {
+
+					this.mouse = MouseInfo.getPointerInfo().getLocation();
+
+					if (p.frame.isVisible()) {
+						this.xpos = p.frame.getBounds().x;
+						this.ypos = p.frame.getBounds().y;
+						if (p.frame.isUndecorated()) {
+							this.ydelta = (p.frame.getBounds().height - p.height) / 2;
+							this.xdelta = (p.frame.getBounds().width - p.width) / 2;
+						} else {
+							this.ydelta = p.frame.getBounds().height - p.height;
+							this.xdelta = p.frame.getBounds().width - p.width;
+						}
+					} else {
+						this.xpos = 0;
+						this.ypos = 0;
+						this.ydelta = 0;
+						this.xdelta = 0;
+					}
+
+					this.left = this.xpos + this.xdelta;
+					this.top = this.ypos + this.ydelta;
+					this.right = this.left + p.width - 1;
+					this.bottom = this.top + p.height - 1;
+
+					if (mouse.x <= this.left || mouse.x >= this.right
+							|| mouse.y <= this.top || mouse.y >= this.bottom) {
+
+						double dx = 0;
+						double dy = 0;
+
+						if (mouse.x <= this.left) {
+							dx = -8;
+						} else if (mouse.x >= this.right) {
+							dx = 8;
+						}
+						if (mouse.y <= this.top) {
+							dy = -8;
+						} else if (mouse.y >= this.bottom) {
+							dy = 8;
+						}
+						if (reverse) {
+							dy = dy*-1;
+							dx = dx*-1;
+						}
+						panHandler.handleDrag(dx, dy);
+					}
+				}
+			} else {
+				if (!mouseIsOverSketch) {
+
+					double dx = 0;
+					double dy = 0;
+
+					/*
+					 * Runs only if in applet and the mouse is off-screen.
+					 * mouseExit is more accurate than p.mouseX and p.mouseY for
+					 * the screen edge - attempt to determine exit location
+					 */
+
+					if (mouseExit.x <= 1) {
+						dx = -8;
+					} else if (mouseExit.x >= p.width - 1) {
+						dx = 8;
+					}
+					if (mouseExit.y <= 1) {
+						dy = -8;
+					} else if (mouseExit.y >= p.height - 1) {
+						dy = 8;
+					}
+					if (reverse) {
+						dy = dy*-1;
+						dx = dx*-1;
+					}
+					panHandler.handleDrag(dx, dy);
+				}
+			}
+		}
+	}
+
+	abstract public class AbstractInterp {
+		double startTime;
+		final double timeInMillis;
+		boolean stopped;
+
+		protected AbstractInterp(final long timeInMillis) {
+			this.timeInMillis = timeInMillis;
+			this.stopped = true;
+		}
+
+		void start() {
+			startTime = p.millis();
+			p.registerDraw(this);
+			this.stopped = false;
+		}
+
+		void cancel() {
+			p.unregisterDraw(this);
+			this.stopped = true;
+		}
+		
+		boolean isStopped() {
+			return this.stopped;
 		}
 
 		public void draw() {
