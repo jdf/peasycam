@@ -43,10 +43,6 @@
 	<property name="reference" location="reference" />
 	<property name="dist" location="distribution" />
 
-	<property name="chmod" value="chmod"/>
-	<property name="rsync" value="rsync"/>
-		
-
 	<target name="init">
 		<echo>Properties initialized.
 	src path			${src}
@@ -64,21 +60,17 @@
 	</target>
 
 	<target name="pushweb" depends="build">
-		<exec executable="${chmod}" dir="distribution/web">
-			<arg value="-R"/>
-			<arg value="+rwX"/>
-			<arg value="*"/>
+		<exec executable="sh" dir="distribution/web">
+			<arg value="-c"/>
+			<arg value="chmod -R +rwX *"/>
 		</exec>
-		<exec executable="${rsync}" dir="distribution/web">
-			<env key="PATH" value="/home/feinberg"/>
-			<arg value="-azv"/>
-			<arg value="--exclude"/>
-			<arg value=".svn/"/>
-			<arg value="--delete"/>
-			<arg value="-e"/>
-			<arg value="ssh"/>
-			<arg value="*"/>
-			<arg value="mrfeinberg.com:/var/www/html/mrfeinberg.com/peasy"/>
+		<exec executable="sh" dir="distribution/web">
+			<arg value="-c"/>
+			<arg value="rsync -azv --exclude .svn --delete -e ssh * jdf@mrfeinberg.com:/var/www/html/mrfeinberg.com/peasy"/>
+		</exec>
+		<exec executable="sh" dir="distribution/web">
+			<arg value="-c"/>
+			<arg value="ssh jdf@mrfeinberg.com chmod -R a+rX /var/www/html/mrfeinberg.com/peasy"/>
 		</exec>
 	</target>
 	
