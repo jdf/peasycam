@@ -231,6 +231,7 @@ public interface PeasyDragHandler {
 public interface PeasyWheelHandler {
     public void handleWheel(final int delta);
 }
+camera.setDamping(double rotate, double zoom, double pan); // default 1,1,1
 camera.setResetOnDoubleClick(boolean resetOnDoubleClick); // default true
 camera.setPanOnScreenEdge(boolean panOnScreenEdge); // default false
 camera.setPanOnScreenEdge(boolean panOnScreenEdge, boolean panEdgeReverse);  //reverses pan direction when true
