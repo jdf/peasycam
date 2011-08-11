@@ -29,7 +29,7 @@ package peasy;
 abstract public class DampedAction {
 	private final PeasyCam p;
 	private double velocity;
-	final double damping;
+	private double damping;
 
 	public DampedAction(final PeasyCam p) {
 		this(p, 0.16);
@@ -68,6 +68,10 @@ abstract public class DampedAction {
 
 	public double getVelocity() {
 		return velocity;
+	}
+
+	public void setDamping(double damping) {
+		this.damping = damping;
 	}
 
 	abstract protected void behave(final double velocity);
