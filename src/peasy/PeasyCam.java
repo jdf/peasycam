@@ -268,27 +268,37 @@ public class PeasyCam {
 	}
 	
 	public double getZoomScale() {
-        return zoomScale;
+		return zoomScale;
 	}
 
 	public void setZoomScale(double zoomScale) {
-        this.zoomScale = zoomScale;
+		this.zoomScale = zoomScale;
 	}
 
 	public double getPanScale() {
-        return panScale;
+		return panScale;
 	}
 
 	public void setPanScale(double panScale) {
-        this.panScale = panScale;
+		this.panScale = panScale;
 	}
 
 	public double getRotationScale() {
-        return rotateScale;
+		return rotateScale;
 	}
 
 	public void setRotationScale(double rotateScale) {
-        this.rotateScale = rotateScale;
+		this.rotateScale = rotateScale;
+	}
+
+	public void setDamping(double rdamp, double zdamp, double pdamp) {
+		//default is 1,1,1
+		rotateX.setDamping(Math.max(0, rdamp));
+		rotateY.setDamping(Math.max(0, rdamp));
+		rotateZ.setDamping(Math.max(0, rdamp));
+		dampedZoom.setDamping(Math.max(0, zdamp));
+		dampedPanY.setDamping(Math.max(0, pdamp));
+		dampedPanX.setDamping(Math.max(0, pdamp));
 	}
 
 	public String version() {
