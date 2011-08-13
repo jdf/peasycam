@@ -292,13 +292,13 @@ public class PeasyCam {
 	}
 
 	public void setDamping(double rdamp, double zdamp, double pdamp) {
-		//default is 1,1,1
-		rotateX.setDamping(Math.max(0, rdamp));
-		rotateY.setDamping(Math.max(0, rdamp));
-		rotateZ.setDamping(Math.max(0, rdamp));
-		dampedZoom.setDamping(Math.max(0, zdamp));
-		dampedPanY.setDamping(Math.max(0, pdamp));
-		dampedPanX.setDamping(Math.max(0, pdamp));
+		//default is .84,.84,.84
+		rotateX.setDamping(Math.min(1, Math.max(0, rdamp)));
+		rotateY.setDamping(Math.min(1, Math.max(0, rdamp)));
+		rotateZ.setDamping(Math.min(1, Math.max(0, rdamp)));
+		dampedZoom.setDamping(Math.min(1, Math.max(0, zdamp)));
+		dampedPanY.setDamping(Math.min(1, Math.max(0, pdamp)));
+		dampedPanX.setDamping(Math.min(1, Math.max(0, pdamp)));
 	}
 
 	public String version() {
