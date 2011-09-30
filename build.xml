@@ -16,10 +16,11 @@
 
 	<property name="javaVersion" value="1.5" />
 
-	<property name="author" value="Jonathan Feinberg" />
+    <property file="library.properties" prefix="library" />
+
+    <property name="author" value="Jonathan Feinberg" />
 	<property name="copyright" value="(c) 2011" />
-	<property name="libraryName" value="PeasyCam" />
-	<property name="versionNumber" value="0.92" />
+	<property name="libraryName" value="peasycam" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
 	<property name="tested:platform" value="Windows" />
@@ -79,14 +80,14 @@
 		<echo message="Bump version number in applet"/>
 		<replaceregexp 
 			match='VERSION = "[^"]+"' 
-			replace='VERSION = "${versionNumber}"' 
+			replace='VERSION = "${library.version}"' 
 			file="${src}/peasy/PeasyCam.java"/>
 
 		<echo message="bin: ${bin}"/>
 		<echo message="javaVersion: ${javaVersion}"/>
 		<echo message="library-classpath$ ${library-classpath}"/>
                 <mkdir dir="${bin}"/>
-		<javac destdir="${bin}" source="${javaVersion}">
+		<javac target="${javaVersion}" destdir="${bin}" source="${javaVersion}">
 			<classpath>
 				<path refid="library-classpath" />
 			</classpath>
@@ -110,13 +111,16 @@
 		<mkdir dir="${realDist}/reference" />
 		<mkdir dir="${realDist}/src" />
 		<jar jarfile="${realDist}/library/${jarFile}" basedir="${bin}" />
+
+        <copy todir="${realDist}" file="library.properties"/>
+		
 		<copy todir="${realDist}/examples">
 			<fileset dir="examples" />
 		</copy>
 		<copy todir="${realDist}/src">
 			<fileset dir="src" />
 		</copy>
-		<copy todir="web" file="${realDist}/library/${jarFile}"/>
+        <copy todir="web" file="${realDist}/library/${jarFile}"/>
 		<copy todir="../Patchy/web" file="${realDist}/library/${jarFile}"/>
 
 		<!-- create the java reference of the library -->
@@ -140,7 +144,7 @@
 		<!-- zip the distribution of the library -->
 		<zip destfile="${dist}/${libraryName}.zip" basedir="${dist}" excludes="**/_DS.Store,**/applet/**" />
 
-		<move file="${dist}/${libraryName}.zip" tofile="${dist}/${libraryName}_${versionNumber}.zip" />
+		<copy file="${dist}/${libraryName}.zip" tofile="${dist}/${libraryName}_${library.version}.zip" />
 
 		<!-- organize the ${dist} folder -->
 		<mkdir dir="${dist}/web" />
@@ -158,26 +162,14 @@
 			<fileset dir="web" />
 		</copy>
 
-		<!--
-  	format the index.html file. 
-  	regular expressions are used to parse the web index.html file. 
-  	key words starting and ending with ## are replaced by values 
-  	defined earlier in the beginning of this build file.
-  	-->
+        <copy tofile="${dist}/web/peasycam.txt" file="library.properties"/>
 
 		<replaceregexp file="${dist}/web/index.html" match="##yourLibrary##" replace="${libraryName}" flags="g" />
-
 		<replaceregexp file="${dist}/web/index.html" match="##author##" replace="${author}" flags="g" />
-
-		<replaceregexp file="${dist}/web/index.html" match="##versionNumber##" replace="${versionNumber}" flags="g" />
-
+		<replaceregexp file="${dist}/web/index.html" match="##versionNumber##" replace="${library.version}" flags="g" />
 		<replaceregexp file="${dist}/web/index.html" match="##yourLink##" replace="${yourLink}" flags="g" />
-
 		<replaceregexp file="${dist}/web/index.html" match="##date##" replace="${date}" flags="g" />
-
 		<replaceregexp file="${dist}/web/index.html" match="##keywords##" replace="${keywords}" flags="g" />
-
-
 
 		<replaceregexp file="${dist}/web/index.html" match="##tested:platform##" replace="${tested:platform}" flags="g" />
 		<replaceregexp file="${dist}/web/index.html" match="##tested:processingVersion##" replace="${tested:processingVersion}" flags="g" />
@@ -185,7 +177,6 @@
 		<replaceregexp file="${dist}/web/index.html" match="##source:host##" replace="${source:host}" flags="g" />
 		<replaceregexp file="${dist}/web/index.html" match="##source:url##" replace="${source:url}" flags="g" />
 		<replaceregexp file="${dist}/web/index.html" match="##source:repository##" replace="${source:repository}" flags="g" />
-
 
 		<echo>---------------------</echo>
 		<antcall target="processExamples" />
@@ -195,8 +186,8 @@
 
 
 		<!-- finish organizating library's distribution -->
-		<mkdir dir="${dist}/web/download" />
-		<copy file="${dist}/${libraryName}_${versionNumber}.zip" todir="${dist}/web/download" />
+        <copy file="${dist}/${libraryName}.zip" todir="${dist}/web" />
+		<copy file="${dist}/${libraryName}_${library.version}.zip" todir="${dist}/web" />
 
 		<copy todir="${processingLibraries}/peasycam/reference">
 			<fileset dir="${reference}" />
