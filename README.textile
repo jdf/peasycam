@@ -75,7 +75,4 @@ PeasyCam is impervious to gimbal lock, and has no known "singularities" or disco
 
 h3. Contributors
 
-Thanks: "Michael Kaufmann":http://www.michael-kaufmann.ch/, "Oori Shalev":http://ooish.com/,
-Jeffrey Gentes, "A.W. Martin":http://imaginationfeed.com,
-"Yiannis Chatzikonstantinou":http://prototy.blogspot.com/,
-and "Donald Ephraim Curtis":http://milkbox.net/ for bug reports and feature suggestions.
+Thanks: "Michael Kaufmann":http://www.michael-kaufmann.ch/, "Oori Shalev":http://ooish.com/, Jeffrey Gentes, "A.W. Martin":http://imaginationfeed.com, "Yiannis Chatzikonstantinou":http://prototy.blogspot.com/, and "Donald Ephraim Curtis":http://milkbox.net/ for bug reports and feature suggestions.
