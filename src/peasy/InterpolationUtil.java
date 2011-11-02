@@ -22,23 +22,34 @@ import peasy.org.apache.commons.math.geometry.Rotation;
 import peasy.org.apache.commons.math.geometry.Vector3D;
 
 public class InterpolationUtil {
+
+	// Thanks to Michael Kaufmann <mail@michael-kaufmann.ch> for improvements to this function.
 	static public Rotation slerp(final Rotation a, final Rotation b, final double t) {
-		final double cosTheta = a.getQ0() * b.getQ0() + a.getQ1() * b.getQ1() + a.getQ2()
-				* b.getQ2() + a.getQ3() * b.getQ3();
+		final double a0 = a.getQ0(), a1 = a.getQ1(), a2 = a.getQ2(), a3 = a.getQ3();
+		double b0 = b.getQ0(), b1 = b.getQ1(), b2 = b.getQ2(), b3 = b.getQ3();
+
+		double cosTheta = a0 * b0 + a1 * b1 + a2 * b2 + a3 * b3;
+		if (cosTheta < 0) {
+			b0 = -b0;
+			b1 = -b1;
+			b2 = -b2;
+			b3 = -b3;
+			cosTheta = -cosTheta;
+		}
+
 		final double theta = Math.acos(cosTheta);
-		final double sinTheta = Math.sin(theta);
+		final double sinTheta = Math.sqrt(1.0 - cosTheta * cosTheta);
 
 		double w1, w2;
-		if (sinTheta > 0.001f) {
-			w1 = Math.sin((1.0f - t) * theta) / sinTheta;
+		if (sinTheta > 0.001) {
+			w1 = Math.sin((1.0 - t) * theta) / sinTheta;
 			w2 = Math.sin(t * theta) / sinTheta;
 		} else {
 			w1 = 1.0 - t;
 			w2 = t;
 		}
-		return new Rotation(w1 * a.getQ0() + w2 * b.getQ0(), w1 * a.getQ1() + w2
-				* b.getQ1(), w1 * a.getQ2() + w2 * b.getQ2(), w1 * a.getQ3() + w2
-				* b.getQ3(), true);
+		return new Rotation(w1 * a0 + w2 * b0, w1 * a1 + w2 * b1, w1 * a2 + w2 * b2, w1
+				* a3 + w2 * b3, true);
 	}
 
 	static public double smooth(final double a, final double b, final double t) {
