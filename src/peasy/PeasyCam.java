@@ -41,7 +41,7 @@ public class PeasyCam {
 	private static final Vector3D UP = Vector3D.plusJ;
 
 	private static enum Constraint {
-		X, Y
+		YAW, PITCH, ROLL, SUPPRESS_ROLL
 	}
 
 	private final PApplet p;
@@ -61,6 +61,7 @@ public class PeasyCam {
 	private Rotation rotation;
 
 	private Constraint dragConstraint = null;
+	private Constraint permaConstraint = null;
 
 	private final InterpolationManager rotationInterps = new InterpolationManager();
 	private final InterpolationManager centerInterps = new InterpolationManager();
@@ -102,7 +103,7 @@ public class PeasyCam {
 
 	private final PMatrix3D originalMatrix; // for HUD restore
 
-	public final String VERSION = "102";
+	public final String VERSION = "105";
 
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, 0, 0, 0, distance);
@@ -183,7 +184,7 @@ public class PeasyCam {
 	public boolean isActive() {
 		return isActive;
 	}
-	
+
 	/**
 	 * <p>
 	 * Turn on or off default mouse-handling behavior:
@@ -211,6 +212,7 @@ public class PeasyCam {
 	 * @param isMouseControlled
 	 * @deprecated use {@link #setActive(boolean)}
 	 */
+	@Deprecated
 	public void setMouseControlled(final boolean isMouseControlled) {
 		setActive(isMouseControlled);
 	}
@@ -219,7 +221,7 @@ public class PeasyCam {
 		return wheelScale;
 	}
 
-	public void setWheelScale(double wheelScale) {
+	public void setWheelScale(final double wheelScale) {
 		this.wheelScale = wheelScale;
 	}
 
@@ -290,9 +292,11 @@ public class PeasyCam {
 
 				if (e.isShiftDown()) {
 					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
-						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.X
-								: Constraint.Y;
+						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.YAW
+								: Constraint.PITCH;
 					}
+				} else if (permaConstraint != null) {
+					dragConstraint = permaConstraint;
 				} else {
 					dragConstraint = null;
 				}
@@ -318,36 +322,45 @@ public class PeasyCam {
 
 	private void mousePan(final double dxMouse, final double dyMouse) {
 		final double panScale = Math.sqrt(distance * .005);
-		pan(dragConstraint == Constraint.Y ? 0 : -dxMouse * panScale,
-				dragConstraint == Constraint.X ? 0 : -dyMouse * panScale);
+		pan(dragConstraint == Constraint.PITCH ? 0 : -dxMouse * panScale,
+				dragConstraint == Constraint.YAW ? 0 : -dyMouse * panScale);
 	}
 
 	private void mouseRotate(final double dx, final double dy) {
 		final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
 
-		if (dragConstraint != Constraint.X) {
-			final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
-			final double adz = Math.abs(dy) * rho;
-			final double ady = Math.abs(dy) * (1 - rho);
-			final int ySign = dy < 0 ? -1 : 1;
-			final Vector3D vy = u.add(new Vector3D(0, ady, 0));
-			rotateX.impulse(Vector3D.angle(u, vy) * ySign);
-			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-			rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-					* (p.mouseX < p.width / 2 ? -1 : 1));
-		}
+		final int xSign = dx > 0 ? -1 : 1;
+		final int ySign = dy < 0 ? -1 : 1;
 
-		if (dragConstraint != Constraint.Y) {
-			final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
-					/ (p.height / 2d);
-			final int xSign = dx > 0 ? -1 : 1;
-			final double adz = Math.abs(dx) * eccentricity;
+		final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
+				/ (p.height / 2d);
+		final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
+
+		if (dragConstraint == null || dragConstraint == Constraint.YAW
+				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
 			final double adx = Math.abs(dx) * (1 - eccentricity);
 			final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
 			rotateY.impulse(Vector3D.angle(u, vx) * xSign);
-			final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-			rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-					* (p.mouseY > p.height / 2 ? -1 : 1));
+		}
+		if (dragConstraint == null || dragConstraint == Constraint.PITCH
+				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
+			final double ady = Math.abs(dy) * (1 - rho);
+			final Vector3D vy = u.add(new Vector3D(0, ady, 0));
+			rotateX.impulse(Vector3D.angle(u, vy) * ySign);
+		}
+		if (dragConstraint == null || dragConstraint == Constraint.ROLL) {
+			{
+				final double adz = Math.abs(dy) * rho;
+				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
+				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
+						* (p.mouseX < p.width / 2 ? -1 : 1));
+			}
+			{
+				final double adz = Math.abs(dx) * eccentricity;
+				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
+				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
+						* (p.mouseY > p.height / 2 ? -1 : 1));
+			}
 		}
 	}
 
@@ -457,6 +470,41 @@ public class PeasyCam {
 
 	public CameraState getState() {
 		return new CameraState(rotation, center, distance);
+	}
+
+	/**
+	 * Permit arbitrary rotation. (Default mode.)
+	 */
+	public void setFreeRotationMode() {
+		permaConstraint = null;
+	}
+
+	/**
+	 * Only permit yaw.
+	 */
+	public void setYawRotationMode() {
+		permaConstraint = Constraint.YAW;
+	}
+
+	/**
+	 * Only permit pitch.
+	 */
+	public void setPitchRotationMode() {
+		permaConstraint = Constraint.PITCH;
+	}
+
+	/**
+	 * Only permit roll.
+	 */
+	public void setRollRotationMode() {
+		permaConstraint = Constraint.ROLL;
+	}
+
+	/**
+	 * Only suppress roll.
+	 */
+	public void setSuppressRollRotationMode() {
+		permaConstraint = Constraint.SUPPRESS_ROLL;
 	}
 
 	public void setMinimumDistance(final double minimumDistance) {
@@ -586,8 +634,8 @@ public class PeasyCam {
 
 		public DistanceInterp(final double endDistance, final long timeInMillis) {
 			super(timeInMillis);
-			this.endDistance = Math.min(maximumDistance, Math.max(minimumDistance,
-					endDistance));
+			this.endDistance = Math.min(maximumDistance,
+					Math.max(minimumDistance, endDistance));
 		}
 
 		@Override

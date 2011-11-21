@@ -179,6 +179,7 @@ void setup() {
 <li><a href="http://prototy.blogspot.com/">Yiannis Chatzikonstantinou</a></li>
 <li><a href="http://milkbox.net/">Donald Ephraim Curtis</a></li>
 <li><a href="http://www.michael-kaufmann.ch/">Michael Kaufmann</a></li>
+<li><a href="http://wiki.uelceca.net/msc0809/published/gennaro+senatore">Gennaro Senatore</a></li>
 </ul>
 <p>Please let me know if I've forgotten to acknowledge you.</p>
 
@@ -202,6 +203,16 @@ PeasyCam(PApplet parent, double distance); // look at 0,0,0
 
 <h3>Methods</h3>
 <pre class="prettyprint">camera.setActive(boolean active);  // false to make this camera stop responding to mouse
+
+// By default, the camera is in "free rotation" mode, but you can
+// constrain it to any axis, around the look-at point:
+camera.setYawRotationMode();   // like spinning a globe
+camera.setPitchRotationMode(); // like a somersault
+camera.setRollRotationMode();  // like a radio knob
+camera.setSuppressRollRotationMode();  // Permit pitch/yaw only.
+
+// Then you can set it back to its default mode:
+camera.setFreeRotationMode();
 
 // reassign particular drag gestures, or set them to null
 camera.setLeftDragHandler(PeasyDragHandler handler);
