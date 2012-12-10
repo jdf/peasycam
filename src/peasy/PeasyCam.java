@@ -18,8 +18,8 @@
  */
 package peasy;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import processing.event.KeyEvent;
+import processing.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -31,6 +31,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PMatrix3D;
+
 
 /**
  * 
@@ -52,7 +53,7 @@ public class PeasyCam {
 	private boolean resetOnDoubleClick = true;
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
-
+	
 	private final DampedAction rotateX, rotateY, rotateZ, dampedZoom, dampedPanX,
 			dampedPanY;
 
@@ -171,12 +172,12 @@ public class PeasyCam {
 		}
 		isActive = active;
 		if (isActive) {
-			p.registerMouseEvent(mouseListener);
-			p.registerKeyEvent(mouseListener);
+			p.registerMethod("mouseEvent", mouseListener);
+			p.registerMethod("keyEvent", mouseListener);
 			p.addMouseWheelListener(mouseWheelListener);
 		} else {
-			p.unregisterMouseEvent(mouseListener);
-			p.unregisterKeyEvent(mouseListener);
+			p.unregisterMethod("mouseEvent", mouseListener);
+			p.unregisterMethod("keyEvent", mouseListener);
 			p.removeMouseWheelListener(mouseWheelListener);
 		}
 	}
@@ -265,7 +266,7 @@ public class PeasyCam {
 		return VERSION;
 	}
 
-	protected class PeasyMousewheelListener implements MouseWheelListener {
+	public class PeasyMousewheelListener implements MouseWheelListener {
 		public void mouseWheelMoved(final MouseWheelEvent e) {
 			if (wheelHandler != null) {
 				wheelHandler.handleWheel(e.getWheelRotation());
@@ -273,22 +274,25 @@ public class PeasyCam {
 		}
 	}
 
-	protected class PeasyMouseListener {
+	public class PeasyMouseListener {
 		public void keyEvent(final KeyEvent e) {
-			if (e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_SHIFT) {
+			if (e.getAction() == KeyEvent.RELEASE && e.getKeyCode() == KeyEvent.SHIFT) {
 				dragConstraint = null;
 			}
 		}
 
 		public void mouseEvent(final MouseEvent e) {
-			if (resetOnDoubleClick && e.getID() == MouseEvent.MOUSE_CLICKED
+			if (resetOnDoubleClick && e.getAction() == MouseEvent.CLICK
 					&& e.getClickCount() == 2) {
 				reset();
-			} else if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+				System.err.println("CLICK");
+			} else if (e.getAction() == MouseEvent.RELEASE) {
 				dragConstraint = null;
-			} else if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
+				System.err.println("RELEASE");
+			} else if (e.getAction() == MouseEvent.DRAG) {
 				final double dx = p.mouseX - p.pmouseX;
 				final double dy = p.mouseY - p.pmouseY;
+				System.err.println("DRAG");
 
 				if (e.isShiftDown()) {
 					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
@@ -302,6 +306,7 @@ public class PeasyCam {
 				}
 
 				final int b = p.mouseButton;
+				System.err.println("button pressed: " + b);
 				if (centerDragHandler != null
 						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
 								.isMetaDown()))) {
@@ -605,11 +610,11 @@ public class PeasyCam {
 
 		void start() {
 			startTime = p.millis();
-			p.registerDraw(this);
+			p.registerMethod("draw", this);
 		}
 
 		void cancel() {
-			p.unregisterDraw(this);
+			p.unregisterMethod("draw", this);
 		}
 
 		public void draw() {
