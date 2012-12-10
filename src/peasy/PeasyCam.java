@@ -18,9 +18,7 @@
  */
 package peasy;
 
-//import java.awt.event.KeyEvent;
 import processing.event.KeyEvent;
-//import java.awt.event.MouseEvent;
 import processing.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -174,14 +172,10 @@ public class PeasyCam {
 		}
 		isActive = active;
 		if (isActive) {
-			//p.registerMouseEvent(mouseListener);
-			//p.registerKeyEvent(mouseListener);
 			p.registerMethod("mouseEvent", mouseListener);
 			p.registerMethod("keyEvent", mouseListener);
 			p.addMouseWheelListener(mouseWheelListener);
 		} else {
-			//p.unregisterMouseEvent(mouseListener);
-			//p.unregisterKeyEvent(mouseListener);
 			p.unregisterMethod("mouseEvent", mouseListener);
 			p.unregisterMethod("keyEvent", mouseListener);
 			p.removeMouseWheelListener(mouseWheelListener);
