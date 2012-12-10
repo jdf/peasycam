@@ -53,7 +53,7 @@ public class PeasyCam {
 	private boolean resetOnDoubleClick = true;
 	private double minimumDistance = 1;
 	private double maximumDistance = Double.MAX_VALUE;
-
+	
 	private final DampedAction rotateX, rotateY, rotateZ, dampedZoom, dampedPanX,
 			dampedPanY;
 
@@ -276,20 +276,23 @@ public class PeasyCam {
 
 	public class PeasyMouseListener {
 		public void keyEvent(final KeyEvent e) {
-			if (e.getAction() == KeyEvent.RELEASED && e.getKeyCode() == KeyEvent.SHIFT_MASK) {
+			if (e.getAction() == KeyEvent.RELEASE && e.getKeyCode() == KeyEvent.SHIFT) {
 				dragConstraint = null;
 			}
 		}
 
 		public void mouseEvent(final MouseEvent e) {
-			if (resetOnDoubleClick && e.getAction() == MouseEvent.CLICKED
+			if (resetOnDoubleClick && e.getAction() == MouseEvent.CLICK
 					&& e.getClickCount() == 2) {
 				reset();
-			} else if (e.getAction() == MouseEvent.RELEASED) {
+				System.err.println("CLICK");
+			} else if (e.getAction() == MouseEvent.RELEASE) {
 				dragConstraint = null;
-			} else if (e.getAction() == MouseEvent.DRAGGED) {
+				System.err.println("RELEASE");
+			} else if (e.getAction() == MouseEvent.DRAG) {
 				final double dx = p.mouseX - p.pmouseX;
 				final double dy = p.mouseY - p.pmouseY;
+				System.err.println("DRAG");
 
 				if (e.isShiftDown()) {
 					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
@@ -303,6 +306,7 @@ public class PeasyCam {
 				}
 
 				final int b = p.mouseButton;
+				System.err.println("button pressed: " + b);
 				if (centerDragHandler != null
 						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
 								.isMetaDown()))) {
