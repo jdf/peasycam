@@ -1,30 +1,29 @@
-<project name="processingLibs" default="build">
+<project name="PeasyCam" default="build">
 
 	<description>
        PeasyCam build
     </description>
 
-	<property name="processing" location="../processing-1.5.1" />
-	<property name="processingLibraries" location="C:/Documents and Settings/Administrator/My Documents/Processing/libraries" />
+	<property name="processingLibraries" location="/Users/feinberg/Documents/Processing/libraries" />
 
-	<property name="libraryClasspath" location="${processing}/lib" />
+	<property name="libraryClasspath" location="../processing/core/library" />
 	<path id="library-classpath">
 		<fileset dir="${libraryClasspath}">
 			<include name="core.jar" />
 		</fileset>
 	</path>
 
-	<property name="javaVersion" value="1.5" />
+	<property name="javaVersion" value="1.6" />
 
     <property file="library.properties" prefix="library" />
 
     <property name="author" value="Jonathan Feinberg" />
-	<property name="copyright" value="(c) 2011" />
+	<property name="copyright" value="(c) 2013" />
 	<property name="libraryName" value="peasycam" />
 	<property name="yourLink" value="http://mrfeinberg.com" />
 	<property name="keywords" value="3D,camera,rotation" />
-	<property name="tested:platform" value="Windows" />
-	<property name="tested:processingVersion" value="1.5.1" />
+	<property name="tested:platform" value="Mac" />
+	<property name="tested:processingVersion" value="2.0" />
 	<property name="tested:dependencies" value="" />
 	<property name="source:host" value="GitHub" />
 	<property name="source:url" value="http://github.com/jdf/peasycam/" />
@@ -85,9 +84,10 @@
 
 		<echo message="bin: ${bin}"/>
 		<echo message="javaVersion: ${javaVersion}"/>
-		<echo message="library-classpath$ ${library-classpath}"/>
+		<echo message="library-classpath$ ${libraryClasspath}"/>
                 <mkdir dir="${bin}"/>
-		<javac target="${javaVersion}" destdir="${bin}" source="${javaVersion}">
+		<javac target="${javaVersion}" destdir="${bin}" source="${javaVersion}"
+			includeantruntime="false">
 			<classpath>
 				<path refid="library-classpath" />
 			</classpath>

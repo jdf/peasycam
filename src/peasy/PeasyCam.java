@@ -99,7 +99,7 @@ public class PeasyCam {
 
 	private final PMatrix3D originalMatrix; // for HUD restore
 
-	public final String VERSION = "t1";
+	public final String VERSION = "200";
 
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, 0, 0, 0, distance);
@@ -268,13 +268,13 @@ public class PeasyCam {
 		public void mouseEvent(final MouseEvent e) {
 			switch (e.getAction()) {
 			case MouseEvent.WHEEL:
-				wheelHandler.handleWheel((int)e.getAmount());
+				wheelHandler.handleWheel((int)e.getCount());
 				break;
 			case MouseEvent.RELEASE:
 				dragConstraint = null;
 				break;
 			case MouseEvent.CLICK:
-				if (resetOnDoubleClick && 2 == (int)e.getAmount()) {
+				if (resetOnDoubleClick && 2 == (int)e.getCount()) {
 					reset();
 				}
 				break;
