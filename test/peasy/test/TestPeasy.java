@@ -5,7 +5,6 @@ import processing.core.PApplet;
 
 @SuppressWarnings("serial")
 public class TestPeasy extends PApplet {
-
 	PeasyCam cam;
 
 	public void setup() {
@@ -32,5 +31,5 @@ public class TestPeasy extends PApplet {
 	@Override
 	public void keyPressed() {
 		cam.setActive(key == 'a');
-	}
+	}	
 }

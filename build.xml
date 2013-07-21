@@ -121,7 +121,6 @@
 			<fileset dir="src" />
 		</copy>
         <copy todir="web" file="${realDist}/library/${jarFile}"/>
-		<copy todir="../Patchy/web" file="${realDist}/library/${jarFile}"/>
 
 		<!-- create the java reference of the library -->
 		<mkdir dir="${reference}" />

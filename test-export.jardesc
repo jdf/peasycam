@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="MacRoman" standalone="no"?>
 <jardesc>
-    <jar path="/Users/feinberg/Documents/Processing/libraries/peasycam/library/peasycam.jar"/>
+    <jar path="PeasyCam/web/HelloPeasy.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/PeasyCam/test-export.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -11,6 +11,10 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/processing-core/library/jogl-all.jar"/>
         <javaElement handleIdentifier="=PeasyCam/src"/>
+        <javaElement handleIdentifier="=processing-core/src"/>
+        <javaElement handleIdentifier="=PeasyCam/test"/>
+        <file path="/processing-core/library/gluegen-rt.jar"/>
     </selectedElements>
 </jardesc>
