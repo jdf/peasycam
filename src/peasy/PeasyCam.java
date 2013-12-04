@@ -43,7 +43,7 @@ public class PeasyCam {
 
 	private final PGraphics g;
 	private final PApplet p;
-	
+
 	private final double startDistance;
 	private final Vector3D startCenter;
 
@@ -335,9 +335,9 @@ public class PeasyCam {
 		final int xSign = dx > 0 ? -1 : 1;
 		final int ySign = dy < 0 ? -1 : 1;
 
-		final double eccentricity = Math.abs((g.height / 2d) - p.mouseY)
-				/ (g.height / 2d);
-		final double rho = Math.abs((g.width / 2d) - p.mouseX) / (g.width / 2d);
+		final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
+				/ (p.height / 2d);
+		final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
 
 		if (dragConstraint == null || dragConstraint == Constraint.YAW
 				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
@@ -356,13 +356,13 @@ public class PeasyCam {
 				final double adz = Math.abs(dy) * rho;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-						* (p.mouseX < g.width / 2 ? -1 : 1));
+						* (p.mouseX < p.width / 2 ? -1 : 1));
 			}
 			{
 				final double adz = Math.abs(dx) * eccentricity;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-						* (p.mouseY > g.height / 2 ? -1 : 1));
+						* (p.mouseY > p.height / 2 ? -1 : 1));
 			}
 		}
 	}
