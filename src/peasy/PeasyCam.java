@@ -42,7 +42,7 @@ public class PeasyCam {
 	}
 
 	private final PGraphics g;
-	private final PApplet parent;
+	private final PApplet p;
 	
 	private final double startDistance;
 	private final Vector3D startCenter;
@@ -117,7 +117,7 @@ public class PeasyCam {
 
 	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
 			final double lookAtZ, final double distance) {
-		this.parent = parent;
+		this.p = parent;
 		this.g  = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
@@ -178,11 +178,11 @@ public class PeasyCam {
 		}
 		isActive = active;
 		if (isActive) {
-			parent.registerMethod("mouseEvent", peasyEventListener);
-			parent.registerMethod("keyEvent", peasyEventListener);
+			p.registerMethod("mouseEvent", peasyEventListener);
+			p.registerMethod("keyEvent", peasyEventListener);
 		} else {
-			parent.unregisterMethod("mouseEvent", peasyEventListener);
-			parent.unregisterMethod("keyEvent", peasyEventListener);
+			p.unregisterMethod("mouseEvent", peasyEventListener);
+			p.unregisterMethod("keyEvent", peasyEventListener);
 		}
 	}
 
@@ -290,8 +290,8 @@ public class PeasyCam {
 				}
 				break;
 			case MouseEvent.DRAG:
-				final double dx = parent.mouseX - parent.pmouseX;
-				final double dy = parent.mouseY - parent.pmouseY;
+				final double dx = p.mouseX - p.pmouseX;
+				final double dy = p.mouseY - p.pmouseY;
 
 				if (e.isShiftDown()) {
 					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
@@ -304,7 +304,7 @@ public class PeasyCam {
 					dragConstraint = null;
 				}
 
-				final int b = parent.mouseButton;
+				final int b = p.mouseButton;
 				if (centerDragHandler != null
 						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
 								.isMetaDown()))) {
@@ -335,9 +335,9 @@ public class PeasyCam {
 		final int xSign = dx > 0 ? -1 : 1;
 		final int ySign = dy < 0 ? -1 : 1;
 
-		final double eccentricity = Math.abs((g.height / 2d) - parent.mouseY)
+		final double eccentricity = Math.abs((g.height / 2d) - p.mouseY)
 				/ (g.height / 2d);
-		final double rho = Math.abs((g.width / 2d) - parent.mouseX) / (g.width / 2d);
+		final double rho = Math.abs((g.width / 2d) - p.mouseX) / (g.width / 2d);
 
 		if (dragConstraint == null || dragConstraint == Constraint.YAW
 				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
@@ -356,13 +356,13 @@ public class PeasyCam {
 				final double adz = Math.abs(dy) * rho;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-						* (parent.mouseX < g.width / 2 ? -1 : 1));
+						* (p.mouseX < g.width / 2 ? -1 : 1));
 			}
 			{
 				final double adz = Math.abs(dx) * eccentricity;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-						* (parent.mouseY > g.height / 2 ? -1 : 1));
+						* (p.mouseY > g.height / 2 ? -1 : 1));
 			}
 		}
 	}
@@ -468,7 +468,7 @@ public class PeasyCam {
 	}
 
 	PApplet getApplet() {
-		return parent;
+		return p;
 	}
 
 	public CameraState getState() {
@@ -607,16 +607,16 @@ public class PeasyCam {
 		}
 
 		void start() {
-			startTime = parent.millis();
-			parent.registerMethod("draw", this);
+			startTime = p.millis();
+			p.registerMethod("draw", this);
 		}
 
 		void cancel() {
-			parent.unregisterMethod("draw", this);
+			p.unregisterMethod("draw", this);
 		}
 
 		public void draw() {
-			final double t = (parent.millis() - startTime) / timeInMillis;
+			final double t = (p.millis() - startTime) / timeInMillis;
 			if (t > .99) {
 				cancel();
 				setEndState();
