@@ -41,7 +41,7 @@ public class PeasyCam {
 		YAW, PITCH, ROLL, SUPPRESS_ROLL
 	}
 
-	private final PGraphics p;
+	private final PGraphics g;
 	private final PApplet parent;
 	
 	private final double startDistance;
@@ -118,7 +118,7 @@ public class PeasyCam {
 	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
 			final double lookAtZ, final double distance) {
 		this.parent = parent;
-		this.p  = pg;
+		this.g  = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
@@ -335,9 +335,9 @@ public class PeasyCam {
 		final int xSign = dx > 0 ? -1 : 1;
 		final int ySign = dy < 0 ? -1 : 1;
 
-		final double eccentricity = Math.abs((p.height / 2d) - parent.mouseY)
-				/ (p.height / 2d);
-		final double rho = Math.abs((p.width / 2d) - parent.mouseX) / (p.width / 2d);
+		final double eccentricity = Math.abs((g.height / 2d) - parent.mouseY)
+				/ (g.height / 2d);
+		final double rho = Math.abs((g.width / 2d) - parent.mouseX) / (g.width / 2d);
 
 		if (dragConstraint == null || dragConstraint == Constraint.YAW
 				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
@@ -356,13 +356,13 @@ public class PeasyCam {
 				final double adz = Math.abs(dy) * rho;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-						* (parent.mouseX < p.width / 2 ? -1 : 1));
+						* (parent.mouseX < g.width / 2 ? -1 : 1));
 			}
 			{
 				final double adz = Math.abs(dx) * eccentricity;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-						* (parent.mouseY > p.height / 2 ? -1 : 1));
+						* (parent.mouseY > g.height / 2 ? -1 : 1));
 			}
 		}
 	}
@@ -414,7 +414,7 @@ public class PeasyCam {
 	public void feed() {
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
-		p.camera((float)pos.getX(), (float)pos.getY(), (float)pos.getZ(), //
+		g.camera((float)pos.getX(), (float)pos.getY(), (float)pos.getZ(), //
 				(float)center.getX(), (float)center.getY(), (float)center.getZ(), //
 				(float)rup.getX(), (float)rup.getY(), (float)rup.getZ());
 	}
@@ -585,17 +585,17 @@ public class PeasyCam {
 	 * Thanks to A.W. Martin for the code to do HUD
 	 */
 	public void beginHUD() {
-		p.pushMatrix();
-		p.hint(PConstants.DISABLE_DEPTH_TEST);
+		g.pushMatrix();
+		g.hint(PConstants.DISABLE_DEPTH_TEST);
 		// Load the identity matrix.
-		p.resetMatrix();
+		g.resetMatrix();
 		// Apply the original Processing transformation matrix.
-		p.applyMatrix(originalMatrix);
+		g.applyMatrix(originalMatrix);
 	}
 
 	public void endHUD() {
-		p.hint(PConstants.ENABLE_DEPTH_TEST);
-		p.popMatrix();
+		g.hint(PConstants.ENABLE_DEPTH_TEST);
+		g.popMatrix();
 	}
 
 	abstract public class AbstractInterp {
