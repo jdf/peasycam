@@ -41,8 +41,9 @@ public class PeasyCam {
 		YAW, PITCH, ROLL, SUPPRESS_ROLL
 	}
 
-	private final PApplet p;
-
+	private final PGraphics p;
+	private final PApplet parent;
+	
 	private final double startDistance;
 	private final Vector3D startCenter;
 
@@ -100,14 +101,24 @@ public class PeasyCam {
 	private final PMatrix3D originalMatrix; // for HUD restore
 
 	public final String VERSION = "200";
-
+	
 	public PeasyCam(final PApplet parent, final double distance) {
-		this(parent, 0, 0, 0, distance);
+		this(parent, parent.g, 0, 0, 0, distance);
 	}
 
 	public PeasyCam(final PApplet parent, final double lookAtX, final double lookAtY,
 			final double lookAtZ, final double distance) {
-		this.p = parent;
+		this(parent, parent.g, lookAtX, lookAtY, lookAtZ, distance);
+	}
+
+	public PeasyCam(final PApplet parent, final PGraphics pg, final double distance) {
+		this(parent, pg, 0, 0, 0, distance);
+	}
+
+	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
+			final double lookAtZ, final double distance) {
+		this.parent = parent;
+		this.p  = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
@@ -167,11 +178,11 @@ public class PeasyCam {
 		}
 		isActive = active;
 		if (isActive) {
-			p.registerMethod("mouseEvent", peasyEventListener);
-			p.registerMethod("keyEvent", peasyEventListener);
+			parent.registerMethod("mouseEvent", peasyEventListener);
+			parent.registerMethod("keyEvent", peasyEventListener);
 		} else {
-			p.unregisterMethod("mouseEvent", peasyEventListener);
-			p.unregisterMethod("keyEvent", peasyEventListener);
+			parent.unregisterMethod("mouseEvent", peasyEventListener);
+			parent.unregisterMethod("keyEvent", peasyEventListener);
 		}
 	}
 
@@ -279,8 +290,8 @@ public class PeasyCam {
 				}
 				break;
 			case MouseEvent.DRAG:
-				final double dx = p.mouseX - p.pmouseX;
-				final double dy = p.mouseY - p.pmouseY;
+				final double dx = parent.mouseX - parent.pmouseX;
+				final double dy = parent.mouseY - parent.pmouseY;
 
 				if (e.isShiftDown()) {
 					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
@@ -293,7 +304,7 @@ public class PeasyCam {
 					dragConstraint = null;
 				}
 
-				final int b = p.mouseButton;
+				final int b = parent.mouseButton;
 				if (centerDragHandler != null
 						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
 								.isMetaDown()))) {
@@ -324,9 +335,9 @@ public class PeasyCam {
 		final int xSign = dx > 0 ? -1 : 1;
 		final int ySign = dy < 0 ? -1 : 1;
 
-		final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
+		final double eccentricity = Math.abs((p.height / 2d) - parent.mouseY)
 				/ (p.height / 2d);
-		final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
+		final double rho = Math.abs((p.width / 2d) - parent.mouseX) / (p.width / 2d);
 
 		if (dragConstraint == null || dragConstraint == Constraint.YAW
 				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
@@ -345,13 +356,13 @@ public class PeasyCam {
 				final double adz = Math.abs(dy) * rho;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-						* (p.mouseX < p.width / 2 ? -1 : 1));
+						* (parent.mouseX < p.width / 2 ? -1 : 1));
 			}
 			{
 				final double adz = Math.abs(dx) * eccentricity;
 				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
 				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-						* (p.mouseY > p.height / 2 ? -1 : 1));
+						* (parent.mouseY > p.height / 2 ? -1 : 1));
 			}
 		}
 	}
@@ -457,7 +468,7 @@ public class PeasyCam {
 	}
 
 	PApplet getApplet() {
-		return p;
+		return parent;
 	}
 
 	public CameraState getState() {
@@ -596,16 +607,16 @@ public class PeasyCam {
 		}
 
 		void start() {
-			startTime = p.millis();
-			p.registerMethod("draw", this);
+			startTime = parent.millis();
+			parent.registerMethod("draw", this);
 		}
 
 		void cancel() {
-			p.unregisterMethod("draw", this);
+			parent.unregisterMethod("draw", this);
 		}
 
 		public void draw() {
-			final double t = (p.millis() - startTime) / timeInMillis;
+			final double t = (parent.millis() - startTime) / timeInMillis;
 			if (t > .99) {
 				cancel();
 				setEndState();
