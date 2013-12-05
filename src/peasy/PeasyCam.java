@@ -41,6 +41,7 @@ public class PeasyCam {
 		YAW, PITCH, ROLL, SUPPRESS_ROLL
 	}
 
+	private final PGraphics g;
 	private final PApplet p;
 
 	private final double startDistance;
@@ -100,14 +101,24 @@ public class PeasyCam {
 	private final PMatrix3D originalMatrix; // for HUD restore
 
 	public final String VERSION = "200";
-
+	
 	public PeasyCam(final PApplet parent, final double distance) {
-		this(parent, 0, 0, 0, distance);
+		this(parent, parent.g, 0, 0, 0, distance);
 	}
 
 	public PeasyCam(final PApplet parent, final double lookAtX, final double lookAtY,
 			final double lookAtZ, final double distance) {
+		this(parent, parent.g, lookAtX, lookAtY, lookAtZ, distance);
+	}
+
+	public PeasyCam(final PApplet parent, final PGraphics pg, final double distance) {
+		this(parent, pg, 0, 0, 0, distance);
+	}
+
+	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
+			final double lookAtZ, final double distance) {
 		this.p = parent;
+		this.g  = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
@@ -403,7 +414,7 @@ public class PeasyCam {
 	public void feed() {
 		final Vector3D pos = rotation.applyTo(LOOK).scalarMultiply(distance).add(center);
 		final Vector3D rup = rotation.applyTo(UP);
-		p.camera((float)pos.getX(), (float)pos.getY(), (float)pos.getZ(), //
+		g.camera((float)pos.getX(), (float)pos.getY(), (float)pos.getZ(), //
 				(float)center.getX(), (float)center.getY(), (float)center.getZ(), //
 				(float)rup.getX(), (float)rup.getY(), (float)rup.getZ());
 	}
@@ -574,17 +585,17 @@ public class PeasyCam {
 	 * Thanks to A.W. Martin for the code to do HUD
 	 */
 	public void beginHUD() {
-		p.pushMatrix();
-		p.hint(PConstants.DISABLE_DEPTH_TEST);
+		g.pushMatrix();
+		g.hint(PConstants.DISABLE_DEPTH_TEST);
 		// Load the identity matrix.
-		p.resetMatrix();
+		g.resetMatrix();
 		// Apply the original Processing transformation matrix.
-		p.applyMatrix(originalMatrix);
+		g.applyMatrix(originalMatrix);
 	}
 
 	public void endHUD() {
-		p.hint(PConstants.ENABLE_DEPTH_TEST);
-		p.popMatrix();
+		g.hint(PConstants.ENABLE_DEPTH_TEST);
+		g.popMatrix();
 	}
 
 	abstract public class AbstractInterp {
