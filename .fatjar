@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Thu Jun 20 21:46:04 EDT 2013
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=HelloPeasy.jar
+manifest.mergeall=true
+manifest.mainclass=peasy.test.TestPeasy
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=
