@@ -100,7 +100,7 @@ public class PeasyCam {
 
 	private final PMatrix3D originalMatrix; // for HUD restore
 
-	public final String VERSION = "200";
+	public final String VERSION = "201";
 	
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, parent.g, 0, 0, 0, distance);
