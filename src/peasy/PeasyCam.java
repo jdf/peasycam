@@ -169,7 +169,6 @@ public class PeasyCam {
 		};
 
 		setActive(true);
-		System.err.println("PeasyCam v" + VERSION);
 	}
 
 	public void setActive(final boolean active) {
