@@ -39,7 +39,7 @@ abstract public class DampedAction {
 		this.p = p;
 		this.velocity = 0;
 		this.damping = 1.0 - friction;
-		p.getApplet().registerMethod("draw", this);
+		p.getApplet().registerDraw(this);
 	}
 
 	public void impulse(final double impulse) {

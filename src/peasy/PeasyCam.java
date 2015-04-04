@@ -18,6 +18,10 @@
  */
 package peasy;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+
 import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
 import peasy.org.apache.commons.math.geometry.RotationOrder;
@@ -26,8 +30,6 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PMatrix3D;
-import processing.event.KeyEvent;
-import processing.event.MouseEvent;
 
 /**
  * 
@@ -100,8 +102,8 @@ public class PeasyCam {
 
 	private final PMatrix3D originalMatrix; // for HUD restore
 
-	public final String VERSION = "200";
-	
+	public final String VERSION = "15100";
+
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, parent.g, 0, 0, 0, distance);
 	}
@@ -115,10 +117,10 @@ public class PeasyCam {
 		this(parent, pg, 0, 0, 0, distance);
 	}
 
-	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
-			final double lookAtZ, final double distance) {
+	public PeasyCam(final PApplet parent, PGraphics pg, final double lookAtX,
+			final double lookAtY, final double lookAtZ, final double distance) {
 		this.p = parent;
-		this.g  = pg;
+		this.g = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = distance;
 		this.rotation = new Rotation();
@@ -177,11 +179,11 @@ public class PeasyCam {
 		}
 		isActive = active;
 		if (isActive) {
-			p.registerMethod("mouseEvent", peasyEventListener);
-			p.registerMethod("keyEvent", peasyEventListener);
+			p.registerMouseEvent(peasyEventListener);
+			p.registerKeyEvent(peasyEventListener);
 		} else {
-			p.unregisterMethod("mouseEvent", peasyEventListener);
-			p.unregisterMethod("keyEvent", peasyEventListener);
+			p.unregisterMouseEvent(peasyEventListener);
+			p.unregisterMouseEvent(peasyEventListener);
 		}
 	}
 
@@ -271,24 +273,24 @@ public class PeasyCam {
 
 	protected class PeasyEventListener {
 		public void keyEvent(final KeyEvent e) {
-			if (e.getAction() == KeyEvent.RELEASE && e.isShiftDown())
+			if (e.getID() == KeyEvent.KEY_RELEASED && e.isShiftDown())
 				dragConstraint = null;
 		}
 
 		public void mouseEvent(final MouseEvent e) {
-			switch (e.getAction()) {
-			case MouseEvent.WHEEL:
-				wheelHandler.handleWheel((int)e.getCount());
+			switch (e.getID()) {
+			case MouseEvent.MOUSE_WHEEL:
+				wheelHandler.handleWheel(((MouseWheelEvent)e).getWheelRotation());
 				break;
-			case MouseEvent.RELEASE:
+			case MouseEvent.MOUSE_RELEASED:
 				dragConstraint = null;
 				break;
-			case MouseEvent.CLICK:
-				if (resetOnDoubleClick && 2 == (int)e.getCount()) {
+			case MouseEvent.MOUSE_CLICKED:
+				if (resetOnDoubleClick && 2 == (int)e.getClickCount()) {
 					reset();
 				}
 				break;
-			case MouseEvent.DRAG:
+			case MouseEvent.MOUSE_DRAGGED:
 				final double dx = p.mouseX - p.pmouseX;
 				final double dy = p.mouseY - p.pmouseY;
 
@@ -607,11 +609,11 @@ public class PeasyCam {
 
 		void start() {
 			startTime = p.millis();
-			p.registerMethod("draw", this);
+			p.registerDraw(this);
 		}
 
 		void cancel() {
-			p.unregisterMethod("draw", this);
+			p.unregisterDraw(this);
 		}
 
 		public void draw() {
