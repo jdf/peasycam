@@ -1,6 +1,13 @@
 PeasyCam provides a dead-simple mouse-driven camera for Processing. It is created and maintained by "Jonathan Feinberg":http://mrfeinberg.com/. It is free for all uses, per the Apache 2.0 license.
 
-To download the distribution, and to see a demo, go to "the PeasyCam home page":http://mrfeinberg.com/peasycam/.
+h3. Download
+
+h4. Processing 1.5.1
+You can download a version of Peasycam compatible with Processing 1.5.1 here:
+"http://static.mrfeinberg.com/peasycam/peasycam_15100.zip":http://static.mrfeinberg.com/peasycam/peasycam_15100.zip
+
+h4. Processing 2 and Later
+You can install the latest Peasycam from within Processing via the menus Sketch > Import Library... > Add Library...
 
 h3. Example
 
