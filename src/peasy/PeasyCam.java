@@ -36,6 +36,7 @@ import processing.event.MouseEvent;
 public class PeasyCam {
 	private static final Vector3D LOOK = Vector3D.plusK;
 	private static final Vector3D UP = Vector3D.plusJ;
+	private static final double SMALLEST_MINIMUM_DISTANCE = 0.01;
 
 	private static enum Constraint {
 		YAW, PITCH, ROLL, SUPPRESS_ROLL
@@ -120,7 +121,7 @@ public class PeasyCam {
 		this.p = parent;
 		this.g  = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
-		this.startDistance = this.distance = distance;
+		this.startDistance = this.distance = Math.max(distance, SMALLEST_MINIMUM_DISTANCE);
 		this.rotation = new Rotation();
 		this.originalMatrix = parent.getMatrix((PMatrix3D)null);
 
@@ -510,7 +511,7 @@ public class PeasyCam {
 	}
 
 	public void setMinimumDistance(final double minimumDistance) {
-		this.minimumDistance = minimumDistance;
+		this.minimumDistance = Math.max(minimumDistance, SMALLEST_MINIMUM_DISTANCE);
 		safeSetDistance(distance);
 	}
 
