@@ -13,7 +13,7 @@
 		</fileset>
 	</path>
 
-	<property name="javaVersion" value="1.6" />
+	<property name="javaVersion" value="1.8" />
 
     <property file="library.properties" prefix="library" />
 
