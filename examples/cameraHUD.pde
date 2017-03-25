@@ -12,6 +12,7 @@ void setup() {
   cam.setMinimumDistance(50);
   cam.setMaximumDistance(500);
 }
+
 void draw() {
   rotateX(-.5);
   rotateY(-.5);
