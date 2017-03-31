@@ -123,7 +123,9 @@ public class PeasyCam {
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = Math.max(distance, SMALLEST_MINIMUM_DISTANCE);
 		this.rotation = new Rotation();
-		this.originalMatrix = parent.getMatrix((PMatrix3D)null);
+		g.beginDraw(); //Make sure camera on the PGraphics is initialized.  We basically use beginDraw to call the protected setViewport method of PGraphicsOpenGL 
+		g.endDraw();
+		this.originalMatrix = g.getMatrix((PMatrix3D)null);
 
 		feed();
 
