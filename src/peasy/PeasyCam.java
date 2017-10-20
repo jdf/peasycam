@@ -18,7 +18,6 @@
  */
 package peasy;
 
-import org.omg.CORBA.INTF_REPOS;
 
 import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
