@@ -594,7 +594,7 @@ public class PeasyCam {
 //		g.applyMatrix(originalMatrix);
 		
 		
-	    g.pushStyle();
+	    // g.pushStyle();
 	    g.pushMatrix();
 	    g.hint(PConstants.DISABLE_DEPTH_TEST);
 	    if(g.is3D() && g.isGL()){
@@ -603,7 +603,7 @@ public class PeasyCam {
 	    g.resetMatrix();
 	    if(g.is3D()){
 	      g.ortho(0, g.width, -g.height, 0, 0, 1);
-		    g.noLights();
+	      g.noLights();
 	    } 
 	}
 
@@ -616,7 +616,7 @@ public class PeasyCam {
 	    }
 	    g.hint(PConstants.ENABLE_DEPTH_TEST);
 	    g.popMatrix();
-	    g.popStyle();
+	    // g.popStyle();
 	}
 
 	abstract public class AbstractInterp {
