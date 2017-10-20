@@ -83,6 +83,21 @@ public class Peasycam_testHUD extends PApplet {
     // screen-aligned 2D HUD
     peasycam.beginHUD();
     image(pg_screen, 0, 0);
+    
+
+    translate(width/2, height/2);
+//    fill(255,0,0);
+//    rotateX(45*DEG_TO_RAD);
+//    lights();
+//    box(100);
+    
+    pushMatrix();
+    translate(0, 0, map(mouseX, 0, width, -100, 100));
+    fill(0,255,0);
+    rect(0, 0, 500, 200);
+    popMatrix();
+//    rect(10, 10, 200, 100);
+    
     peasycam.endHUD();
   
   }
