@@ -596,7 +596,6 @@ public class PeasyCam {
 		
 	    g.pushStyle();
 	    g.pushMatrix();
-	    g.noLights();
 	    g.hint(PConstants.DISABLE_DEPTH_TEST);
 	    if(g.is3D() && g.isGL()){
 	      ((PGraphicsOpenGL) g).pushProjection();
@@ -604,6 +603,7 @@ public class PeasyCam {
 	    g.resetMatrix();
 	    if(g.is3D()){
 	      g.ortho(0, g.width, -g.height, 0, 0, 1);
+		    g.noLights();
 	    } 
 	}
 
