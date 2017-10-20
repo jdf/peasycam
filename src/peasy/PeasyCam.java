@@ -600,13 +600,12 @@ public class PeasyCam {
 		g.hint(PConstants.DISABLE_DEPTH_TEST);
 		g.pushMatrix();
 		g.resetMatrix();
-		if(g.isGL()){
+		// 3D is always GL (in processing 3), so this check is probably redundant.
+		if(g.isGL() && g.is3D()){
 			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
-			pgl.pushProjection();
 			pushedLights = pgl.lights;
 			pgl.lights = false;
-		}
-		if(g.is3D()){
+			pgl.pushProjection();
 			g.ortho(0, g.width, -g.height, 0, -Float.MAX_VALUE, +Float.MAX_VALUE);
 		}
 	}
@@ -618,7 +617,7 @@ public class PeasyCam {
 	 * 
 	 */
 	public void endHUD() {
-		if(g.isGL()){
+		if(g.isGL() && g.is3D()){
 			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
 			pgl.popProjection();
 			pgl.lights = pushedLights;
