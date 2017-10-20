@@ -28,6 +28,7 @@ import processing.core.PGraphics;
 import processing.core.PMatrix3D;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
+import processing.opengl.PGraphicsOpenGL;
 
 /**
  * 
@@ -99,7 +100,7 @@ public class PeasyCam {
 	private final PeasyEventListener peasyEventListener = new PeasyEventListener();
 	private boolean isActive = false;
 
-	private final PMatrix3D originalMatrix; // for HUD restore
+//	private final PMatrix3D originalMatrix; // for HUD restore
 
 	public final String VERSION = "202";
 	
@@ -123,7 +124,7 @@ public class PeasyCam {
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = Math.max(distance, SMALLEST_MINIMUM_DISTANCE);
 		this.rotation = new Rotation();
-		this.originalMatrix = parent.getMatrix((PMatrix3D)null);
+//		this.originalMatrix = parent.getMatrix((PMatrix3D)null);
 
 		feed();
 
@@ -585,17 +586,37 @@ public class PeasyCam {
 	 * Thanks to A.W. Martin for the code to do HUD
 	 */
 	public void beginHUD() {
-		g.pushMatrix();
-		g.hint(PConstants.DISABLE_DEPTH_TEST);
-		// Load the identity matrix.
-		g.resetMatrix();
-		// Apply the original Processing transformation matrix.
-		g.applyMatrix(originalMatrix);
+//		g.pushMatrix();
+//		g.hint(PConstants.DISABLE_DEPTH_TEST);
+//		// Load the identity matrix.
+//		g.resetMatrix();
+//		// Apply the original Processing transformation matrix.
+//		g.applyMatrix(originalMatrix);
+		
+		
+	    g.pushStyle();
+	    g.pushMatrix();
+	    g.noLights();
+	    g.hint(PConstants.DISABLE_DEPTH_TEST);
+	    if(g.is3D() && g.isGL()){
+	      ((PGraphicsOpenGL) g).pushProjection();
+	    }
+	    g.resetMatrix();
+	    if(g.is3D()){
+	      g.ortho(0, g.width, -g.height, 0, 0, 1);
+	    } 
 	}
 
 	public void endHUD() {
-		g.hint(PConstants.ENABLE_DEPTH_TEST);
-		g.popMatrix();
+//		g.hint(PConstants.ENABLE_DEPTH_TEST);
+//		g.popMatrix();
+		
+	    if(g.is3D() && g.isGL()){
+	      ((PGraphicsOpenGL) g).popProjection();
+	    }
+	    g.hint(PConstants.ENABLE_DEPTH_TEST);
+	    g.popMatrix();
+	    g.popStyle();
 	}
 
 	abstract public class AbstractInterp {
