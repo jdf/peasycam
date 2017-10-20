@@ -582,7 +582,7 @@ public class PeasyCam {
 	
 	
 	
-	private boolean pushed_lights = false;
+	private boolean pushedLights = false;
 
 	/**
 	 * 
@@ -603,7 +603,7 @@ public class PeasyCam {
 		if(g.isGL()){
 			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
 			pgl.pushProjection();
-			pushed_lights = pgl.lights;
+			pushedLights = pgl.lights;
 			pgl.lights = false;
 		}
 		if(g.is3D()){
@@ -621,8 +621,7 @@ public class PeasyCam {
 		if(g.isGL()){
 			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
 			pgl.popProjection();
-			pgl.lights = pushed_lights;
-			pushed_lights = false;
+			pgl.lights = pushedLights;
 		}
 		g.popMatrix();
 		g.hint(PConstants.ENABLE_DEPTH_TEST);

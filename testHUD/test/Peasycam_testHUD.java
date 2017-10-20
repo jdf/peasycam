@@ -65,6 +65,16 @@ public class Peasycam_testHUD extends PApplet {
     fill(0xFFFFFFFF); rect(       0,height-wh, wh, wh, 30);
     
     peasycam.endHUD();
+    
+    
+    // check if everything got restored
+    // Note: Depth testing was disabled during the HUD-drawing
+    translate(0,-80,0);
+    noStroke();
+    fill(128);
+    box(60);
+    
+    
   
   }
   
