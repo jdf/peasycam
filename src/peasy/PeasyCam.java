@@ -18,6 +18,7 @@
  */
 package peasy;
 
+
 import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
 import peasy.org.apache.commons.math.geometry.RotationOrder;
@@ -25,9 +26,9 @@ import peasy.org.apache.commons.math.geometry.Vector3D;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
-import processing.core.PMatrix3D;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
+import processing.opengl.PGraphicsOpenGL;
 
 /**
  * 
@@ -99,8 +100,6 @@ public class PeasyCam {
 	private final PeasyEventListener peasyEventListener = new PeasyEventListener();
 	private boolean isActive = false;
 
-	private final PMatrix3D originalMatrix; // for HUD restore
-
 	public final String VERSION = "202";
 	
 	public PeasyCam(final PApplet parent, final double distance) {
@@ -119,11 +118,10 @@ public class PeasyCam {
 	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
 			final double lookAtZ, final double distance) {
 		this.p = parent;
-		this.g  = pg;
+		this.g = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
 		this.startDistance = this.distance = Math.max(distance, SMALLEST_MINIMUM_DISTANCE);
 		this.rotation = new Rotation();
-		this.originalMatrix = parent.getMatrix((PMatrix3D)null);
 
 		feed();
 
@@ -581,21 +579,51 @@ public class PeasyCam {
 		return new float[] { 0, 0, 0 };
 	}
 
+	
+	
+	
+	private boolean pushedLights = false;
+
 	/**
-	 * Thanks to A.W. Martin for the code to do HUD
+	 * 
+	 * begin screen-aligned 2D-drawing.
+	 * <pre>
+	 * beginHUD()
+	 *   disabled depth test
+	 *   disabled lights
+	 *   ortho
+	 * endHUD()
+	 * </pre>
+	 * 
 	 */
 	public void beginHUD() {
-		g.pushMatrix();
 		g.hint(PConstants.DISABLE_DEPTH_TEST);
-		// Load the identity matrix.
+		g.pushMatrix();
 		g.resetMatrix();
-		// Apply the original Processing transformation matrix.
-		g.applyMatrix(originalMatrix);
+		// 3D is always GL (in processing 3), so this check is probably redundant.
+		if(g.isGL() && g.is3D()){
+			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
+			pushedLights = pgl.lights;
+			pgl.lights = false;
+			pgl.pushProjection();
+			g.ortho(0, g.width, -g.height, 0, -Float.MAX_VALUE, +Float.MAX_VALUE);
+		}
 	}
 
+
+	/**
+	 * 
+	 * end screen-aligned 2D-drawing.
+	 * 
+	 */
 	public void endHUD() {
-		g.hint(PConstants.ENABLE_DEPTH_TEST);
+		if(g.isGL() && g.is3D()){
+			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
+			pgl.popProjection();
+			pgl.lights = pushedLights;
+		}
 		g.popMatrix();
+		g.hint(PConstants.ENABLE_DEPTH_TEST);
 	}
 
 	abstract public class AbstractInterp {
