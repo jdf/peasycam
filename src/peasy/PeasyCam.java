@@ -608,8 +608,6 @@ public class PeasyCam {
 		}
 		if(g.is3D()){
 			g.ortho(0, g.width, -g.height, 0, -Float.MAX_VALUE, +Float.MAX_VALUE);
-			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
-			pgl.updateProjmodelview();
 		}
 	}
 
