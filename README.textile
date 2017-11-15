@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjdf%2Fpeasycam.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjdf%2Fpeasycam?ref=badge_shield)
+
 PeasyCam provides a dead-simple mouse-driven camera for Processing. It is created and maintained by "Jonathan Feinberg":http://mrfeinberg.com/. It is free for all uses, per the Apache 2.0 license.
 
 h3. Download
@@ -95,3 +97,7 @@ PeasyCam is impervious to gimbal lock, and has no known "singularities" or disco
 h3. Contributors
 
 Thanks: "Gennaro Senatore":http://wiki.uelceca.net/msc0809/published/gennaro+senatore, "Michael Kaufmann":http://www.michael-kaufmann.ch/, "Oori Shalev":http://ooish.com/, Jeffrey Gentes, "A.W. Martin":http://imaginationfeed.com, "Yiannis Chatzikonstantinou":http://prototy.blogspot.com/, and "Donald Ephraim Curtis":http://milkbox.net/ for bug reports and feature suggestions.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjdf%2Fpeasycam.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjdf%2Fpeasycam?ref=badge_large)
