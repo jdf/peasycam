@@ -34,6 +34,9 @@ import processing.opengl.PGraphicsOpenGL;
  * @author Jonathan Feinberg
  */
 public class PeasyCam {
+	
+	public final String VERSION = "210";
+	
 	private static final Vector3D LOOK = Vector3D.plusK;
 	private static final Vector3D UP = Vector3D.plusJ;
 	private static final double SMALLEST_MINIMUM_DISTANCE = 0.01;
@@ -102,7 +105,7 @@ public class PeasyCam {
 	private final PeasyEventListener peasyEventListener = new PeasyEventListener();
 	private boolean isActive = false;
 
-	public final String VERSION = "202";
+
 
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, parent.g, 0, 0, 0, distance);
