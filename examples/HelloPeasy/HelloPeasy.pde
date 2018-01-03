@@ -1,24 +1,29 @@
-import peasy.*;
+
+import peasy.PeasyCam;
+
 
 PeasyCam cam;
 
-void setup() {
-  size(200,200,P3D);
-  cam = new PeasyCam(this, 100);
-  cam.setMinimumDistance(50);
-  cam.setMaximumDistance(500);
+public void settings() {
+  size(800, 600, P3D);
 }
-void draw() {
-  rotateX(-.5);
-  rotateY(-.5);
+
+public void setup() {
+  cam = new PeasyCam(this, 400);
+}
+
+public void draw() {
+  rotateX(-.5f);
+  rotateY(-.5f);
+  lights();
+  scale(10);
+  strokeWeight(1 / 10f);
   background(0);
-  fill(255,0,0);
+  fill(255, 0, 0);
   box(30);
   pushMatrix();
-  translate(0,0,20);
-  fill(0,0,255);
+  translate(0, 0, 20);
+  fill(0, 0, 255);
   box(5);
   popMatrix();
 }
-
-
