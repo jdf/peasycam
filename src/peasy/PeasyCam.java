@@ -32,6 +32,8 @@ import processing.opengl.PGraphicsOpenGL;
 /**
  * 
  * @author Jonathan Feinberg
+ * @author Thomas Diewald
+ * 
  */
 public class PeasyCam {
 	
@@ -293,7 +295,7 @@ public class PeasyCam {
 	public PGraphics getCanvas() {
 		return g;
 	}
-
+	
 	public boolean insideViewport(double x, double y) {
 		float x0 = viewport[0], x1 = x0 + viewport[2];
 		float y0 = viewport[1], y1 = y0 + viewport[3];
@@ -369,7 +371,6 @@ public class PeasyCam {
 	}
 
 	private void mouseZoom(final double delta) {
-		//		double new_distance = distance + delta * Math.log1p(distance);
 		double new_distance = distance + delta * distance * 0.02;
 		if (new_distance < minimumDistance) {
 			new_distance = minimumDistance;
@@ -383,16 +384,12 @@ public class PeasyCam {
 	}
 
 	private void mousePan(final double dxMouse, final double dyMouse) {
-		//		final double panScale = Math.sqrt(distance * .005);
 		final double panScale = distance * 0.0025;
 		pan(dragConstraint == Constraint.PITCH ? 0 : -dxMouse * panScale,
 				dragConstraint == Constraint.YAW ? 0 : -dyMouse * panScale);
 	}
 
 	private void mouseRotate(final double dx, final double dy) {
-
-		//	    double mult = -0.0025;
-
 		double mult = -Math.pow(Math.log10(1 + distance), 0.5) * 0.00125f;
 
 		double dmx = dx * mult;
