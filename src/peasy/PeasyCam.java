@@ -18,7 +18,6 @@
  */
 package peasy;
 
-
 import peasy.org.apache.commons.math.geometry.CardanEulerSingularityException;
 import peasy.org.apache.commons.math.geometry.Rotation;
 import peasy.org.apache.commons.math.geometry.RotationOrder;
@@ -33,8 +32,13 @@ import processing.opengl.PGraphicsOpenGL;
 /**
  * 
  * @author Jonathan Feinberg
+ * @author Thomas Diewald
+ * 
  */
 public class PeasyCam {
+	
+	public final String VERSION = "210";
+	
 	private static final Vector3D LOOK = Vector3D.plusK;
 	private static final Vector3D UP = Vector3D.plusJ;
 	private static final double SMALLEST_MINIMUM_DISTANCE = 0.01;
@@ -60,6 +64,9 @@ public class PeasyCam {
 	private Vector3D center;
 	private Rotation rotation;
 
+	// viewport for the mouse-pointer [x,y,w,h]
+	private int[] viewport = new int[4];
+
 	private Constraint dragConstraint = null;
 	private Constraint permaConstraint = null;
 
@@ -67,7 +74,7 @@ public class PeasyCam {
 	private final InterpolationManager centerInterps = new InterpolationManager();
 	private final InterpolationManager distanceInterps = new InterpolationManager();
 
-	private final PeasyDragHandler panHandler /* ha ha ha */= new PeasyDragHandler() {
+	private final PeasyDragHandler panHandler /* ha ha ha */ = new PeasyDragHandler() {
 		public void handleDrag(final double dx, final double dy) {
 			dampedPanX.impulse(dx / 8.);
 			dampedPanY.impulse(dy / 8.);
@@ -100,8 +107,8 @@ public class PeasyCam {
 	private final PeasyEventListener peasyEventListener = new PeasyEventListener();
 	private boolean isActive = false;
 
-	public final String VERSION = "202";
-	
+
+
 	public PeasyCam(final PApplet parent, final double distance) {
 		this(parent, parent.g, 0, 0, 0, distance);
 	}
@@ -115,13 +122,19 @@ public class PeasyCam {
 		this(parent, pg, 0, 0, 0, distance);
 	}
 
-	public PeasyCam(final PApplet parent, PGraphics pg,  final double lookAtX, final double lookAtY,
-			final double lookAtZ, final double distance) {
+	public PeasyCam(final PApplet parent, PGraphics pg, final double lookAtX,
+			final double lookAtY, final double lookAtZ, final double distance) {
 		this.p = parent;
 		this.g = pg;
 		this.startCenter = this.center = new Vector3D(lookAtX, lookAtY, lookAtZ);
-		this.startDistance = this.distance = Math.max(distance, SMALLEST_MINIMUM_DISTANCE);
+		this.startDistance = this.distance = Math.max(distance,
+				SMALLEST_MINIMUM_DISTANCE);
 		this.rotation = new Rotation();
+
+		viewport[0] = 0;
+		viewport[1] = 0;
+		viewport[2] = pg.width;
+		viewport[3] = pg.height;
 
 		feed();
 
@@ -268,7 +281,31 @@ public class PeasyCam {
 		return VERSION;
 	}
 
+	public void setViewport(int x, int y, int w, int h) {
+		viewport[0] = x;
+		viewport[1] = y;
+		viewport[2] = w;
+		viewport[3] = h;
+	}
+
+	public int[] getViewport() {
+		return viewport;
+	}
+
+	public PGraphics getCanvas() {
+		return g;
+	}
+	
+	public boolean insideViewport(double x, double y) {
+		float x0 = viewport[0], x1 = x0 + viewport[2];
+		float y0 = viewport[1], y1 = y0 + viewport[3];
+		return (x > x0) && (x < x1) && (y > y0) && (y < y1);
+	}
+
 	protected class PeasyEventListener {
+
+		public boolean isActive = false;
+
 		public void keyEvent(final KeyEvent e) {
 			if (e.getAction() == KeyEvent.RELEASE && e.isShiftDown())
 				dragConstraint = null;
@@ -276,41 +313,57 @@ public class PeasyCam {
 
 		public void mouseEvent(final MouseEvent e) {
 			switch (e.getAction()) {
-			case MouseEvent.WHEEL:
-				wheelHandler.handleWheel((int)e.getCount());
+
+			case MouseEvent.PRESS:
+				if (insideViewport(p.mouseX, p.mouseY)) {
+					isActive = true;
+				}
 				break;
+
 			case MouseEvent.RELEASE:
 				dragConstraint = null;
+				isActive = false;
 				break;
+
 			case MouseEvent.CLICK:
-				if (resetOnDoubleClick && 2 == (int)e.getCount()) {
-					reset();
+				if (insideViewport(p.mouseX, p.mouseY)) {
+					if (resetOnDoubleClick && 2 == (int)e.getCount()) {
+						reset();
+					}
 				}
 				break;
-			case MouseEvent.DRAG:
-				final double dx = p.mouseX - p.pmouseX;
-				final double dy = p.mouseY - p.pmouseY;
 
-				if (e.isShiftDown()) {
-					if (dragConstraint == null && Math.abs(dx - dy) > 1) {
-						dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.YAW
-								: Constraint.PITCH;
-					}
-				} else if (permaConstraint != null) {
-					dragConstraint = permaConstraint;
-				} else {
-					dragConstraint = null;
+			case MouseEvent.WHEEL:
+				if (insideViewport(p.mouseX, p.mouseY)) {
+					wheelHandler.handleWheel((int)e.getCount());
 				}
+				break;
 
-				final int b = p.mouseButton;
-				if (centerDragHandler != null
-						&& (b == PConstants.CENTER || (b == PConstants.LEFT && e
-								.isMetaDown()))) {
-					centerDragHandler.handleDrag(dx, dy);
-				} else if (leftDragHandler != null && b == PConstants.LEFT) {
-					leftDragHandler.handleDrag(dx, dy);
-				} else if (rightDraghandler != null && b == PConstants.RIGHT) {
-					rightDraghandler.handleDrag(dx, dy);
+			case MouseEvent.DRAG:
+				if (isActive) {
+					final double dx = p.mouseX - p.pmouseX;
+					final double dy = p.mouseY - p.pmouseY;
+
+					if (e.isShiftDown()) {
+						if (dragConstraint == null && Math.abs(dx - dy) > 1) {
+							dragConstraint = Math.abs(dx) > Math.abs(dy) ? Constraint.YAW
+									: Constraint.PITCH;
+						}
+					} else if (permaConstraint != null) {
+						dragConstraint = permaConstraint;
+					} else {
+						dragConstraint = null;
+					}
+
+					final int b = p.mouseButton;
+					if (centerDragHandler != null && (b == PConstants.CENTER
+							|| (b == PConstants.LEFT && e.isMetaDown()))) {
+						centerDragHandler.handleDrag(dx, dy);
+					} else if (leftDragHandler != null && b == PConstants.LEFT) {
+						leftDragHandler.handleDrag(dx, dy);
+					} else if (rightDraghandler != null && b == PConstants.RIGHT) {
+						rightDraghandler.handleDrag(dx, dy);
+					}
 				}
 				break;
 			}
@@ -318,50 +371,50 @@ public class PeasyCam {
 	}
 
 	private void mouseZoom(final double delta) {
-		safeSetDistance(distance + delta * Math.log1p(distance));
+		double new_distance = distance + delta * distance * 0.02;
+		if (new_distance < minimumDistance) {
+			new_distance = minimumDistance;
+			dampedZoom.stop();
+		}
+		if (new_distance > maximumDistance) {
+			new_distance = maximumDistance;
+			dampedZoom.stop();
+		}
+		safeSetDistance(new_distance);
 	}
 
 	private void mousePan(final double dxMouse, final double dyMouse) {
-		final double panScale = Math.sqrt(distance * .005);
+		final double panScale = distance * 0.0025;
 		pan(dragConstraint == Constraint.PITCH ? 0 : -dxMouse * panScale,
 				dragConstraint == Constraint.YAW ? 0 : -dyMouse * panScale);
 	}
 
 	private void mouseRotate(final double dx, final double dy) {
-		final Vector3D u = LOOK.scalarMultiply(100 + .6 * startDistance).negate();
+		double mult = -Math.pow(Math.log10(1 + distance), 0.5) * 0.00125f;
 
-		final int xSign = dx > 0 ? -1 : 1;
-		final int ySign = dy < 0 ? -1 : 1;
+		double dmx = dx * mult;
+		double dmy = dy * mult;
 
-		final double eccentricity = Math.abs((p.height / 2d) - p.mouseY)
-				/ (p.height / 2d);
-		final double rho = Math.abs((p.width / 2d) - p.mouseX) / (p.width / 2d);
+		double viewX = viewport[0];
+		double viewY = viewport[1];
+		double viewW = viewport[2];
+		double viewH = viewport[3];
+
+		// mouse [-1, +1]
+		double mxNdc = Math.min(Math.max((p.mouseX - viewX) / viewW, 0), 1) * 2 - 1;
+		double myNdc = Math.min(Math.max((p.mouseY - viewY) / viewH, 0), 1) * 2 - 1;
 
 		if (dragConstraint == null || dragConstraint == Constraint.YAW
 				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
-			final double adx = Math.abs(dx) * (1 - eccentricity);
-			final Vector3D vx = u.add(new Vector3D(adx, 0, 0));
-			rotateY.impulse(Vector3D.angle(u, vx) * xSign);
+			rotateY.impulse(+dmx * (1.0 - myNdc * myNdc));
 		}
 		if (dragConstraint == null || dragConstraint == Constraint.PITCH
 				|| dragConstraint == Constraint.SUPPRESS_ROLL) {
-			final double ady = Math.abs(dy) * (1 - rho);
-			final Vector3D vy = u.add(new Vector3D(0, ady, 0));
-			rotateX.impulse(Vector3D.angle(u, vy) * ySign);
+			rotateX.impulse(-dmy * (1.0 - mxNdc * mxNdc));
 		}
 		if (dragConstraint == null || dragConstraint == Constraint.ROLL) {
-			{
-				final double adz = Math.abs(dy) * rho;
-				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-				rotateZ.impulse(Vector3D.angle(u, vz) * -ySign
-						* (p.mouseX < p.width / 2 ? -1 : 1));
-			}
-			{
-				final double adz = Math.abs(dx) * eccentricity;
-				final Vector3D vz = u.add(new Vector3D(0, adz, 0));
-				rotateZ.impulse(Vector3D.angle(u, vz) * xSign
-						* (p.mouseY > p.height / 2 ? -1 : 1));
-			}
+			rotateZ.impulse(-dmx * myNdc);
+			rotateZ.impulse(+dmy * mxNdc);
 		}
 	}
 
@@ -374,8 +427,8 @@ public class PeasyCam {
 	}
 
 	public void setDistance(final double newDistance, final long animationTimeMillis) {
-		distanceInterps.startInterpolation(new DistanceInterp(newDistance,
-				animationTimeMillis));
+		distanceInterps
+				.startInterpolation(new DistanceInterp(newDistance, animationTimeMillis));
 	}
 
 	public float[] getLookAt() {
@@ -528,12 +581,12 @@ public class PeasyCam {
 
 	public void setState(final CameraState state, final long animationTimeMillis) {
 		if (animationTimeMillis > 0) {
-			rotationInterps.startInterpolation(new RotationInterp(state.rotation,
-					animationTimeMillis));
-			centerInterps.startInterpolation(new CenterInterp(state.center,
-					animationTimeMillis));
-			distanceInterps.startInterpolation(new DistanceInterp(state.distance,
-					animationTimeMillis));
+			rotationInterps.startInterpolation(
+					new RotationInterp(state.rotation, animationTimeMillis));
+			centerInterps.startInterpolation(
+					new CenterInterp(state.center, animationTimeMillis));
+			distanceInterps.startInterpolation(
+					new DistanceInterp(state.distance, animationTimeMillis));
 		} else {
 			this.rotation = state.rotation;
 			this.center = state.center;
@@ -579,9 +632,6 @@ public class PeasyCam {
 		return new float[] { 0, 0, 0 };
 	}
 
-	
-	
-	
 	private boolean pushedLights = false;
 
 	/**
@@ -601,15 +651,14 @@ public class PeasyCam {
 		g.pushMatrix();
 		g.resetMatrix();
 		// 3D is always GL (in processing 3), so this check is probably redundant.
-		if(g.isGL() && g.is3D()){
+		if (g.isGL() && g.is3D()) {
 			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
 			pushedLights = pgl.lights;
 			pgl.lights = false;
 			pgl.pushProjection();
-			g.ortho(0, g.width, -g.height, 0, -Float.MAX_VALUE, +Float.MAX_VALUE);
+			g.ortho(0, viewport[2], -viewport[3], 0, -Float.MAX_VALUE, +Float.MAX_VALUE);
 		}
 	}
-
 
 	/**
 	 * 
@@ -617,7 +666,7 @@ public class PeasyCam {
 	 * 
 	 */
 	public void endHUD() {
-		if(g.isGL() && g.is3D()){
+		if (g.isGL() && g.is3D()) {
 			PGraphicsOpenGL pgl = (PGraphicsOpenGL)g;
 			pgl.popProjection();
 			pgl.lights = pushedLights;
