@@ -85,7 +85,7 @@
 		<echo message="bin: ${bin}"/>
 		<echo message="javaVersion: ${javaVersion}"/>
 		<echo message="library-classpath$ ${libraryClasspath}"/>
-                <mkdir dir="${bin}"/>
+        <mkdir dir="${bin}"/>
 		<javac target="${javaVersion}" destdir="${bin}" source="${javaVersion}"
 			includeantruntime="false">
 			<classpath>
@@ -110,7 +110,15 @@
 		<mkdir dir="${realDist}/examples" />
 		<mkdir dir="${realDist}/reference" />
 		<mkdir dir="${realDist}/src" />
-		<jar jarfile="${realDist}/library/${jarFile}" basedir="${bin}" />
+		<jar 
+			jarfile="${realDist}/library/${jarFile}" 
+			basedir="${bin}" 
+			includes="peasy/**"
+			excludes="peasy/org/**"/>
+		<jar 
+			jarfile="${realDist}/library/peasy-math.jar" 
+			basedir="${bin}" 
+			includes="peasy/org/apache/commons/math/**"/>
 
         <copy todir="${realDist}" file="library.properties"/>
 		
