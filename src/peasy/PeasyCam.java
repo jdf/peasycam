@@ -37,7 +37,7 @@ import processing.opengl.PGraphicsOpenGL;
  */
 public class PeasyCam {
 	
-	public final String VERSION = "210";
+	public final String VERSION = "301";
 	
 	private static final Vector3D LOOK = Vector3D.plusK;
 	private static final Vector3D UP = Vector3D.plusJ;
@@ -334,7 +334,7 @@ public class PeasyCam {
 				break;
 
 			case MouseEvent.WHEEL:
-				if (insideViewport(p.mouseX, p.mouseY)) {
+				if (wheelHandler != null && insideViewport(p.mouseX, p.mouseY)) {
 					wheelHandler.handleWheel((int)e.getCount());
 				}
 				break;
