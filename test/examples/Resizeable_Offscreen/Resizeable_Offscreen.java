@@ -2,7 +2,6 @@ package examples.Resizeable_Offscreen;
 
 import peasy.PeasyCam;
 import processing.core.PApplet;
-import processing.core.PShape;
 import processing.opengl.PGraphics3D;
 
 public class Resizeable_Offscreen extends PApplet {
