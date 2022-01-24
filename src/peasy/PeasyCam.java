@@ -503,6 +503,21 @@ public class PeasyCam {
 		feed();
 	}
 
+	public void move(final double dx, final double dy, final double dz) {
+		center = center.add(rotation.applyTo(new Vector3D(dx, dy, dz)));
+		feed();
+	}
+
+	public void forward(final double distance) {
+		center = center.add(rotation.applyTo(new Vector3D(0, 0, distance)));
+		feed();
+	}
+
+	public void backward(final double distance) {
+		center = center.add(rotation.applyTo(new Vector3D(0, 0, -distance)));
+		feed();
+	}
+
 	public void rotateX(final double angle) {
 		rotation = rotation.applyTo(new Rotation(Vector3D.plusI, angle));
 		feed();
