@@ -507,11 +507,11 @@ public class PeasyCam {
 		move(dx, dy, 0);
 	}
 
-	public void forward(final double distance) {
+	public void pushIn(final double distance) {
 		move(0, 0, -distance);
 	}
 
-	public void backward(final double distance) {
+	public void pushOut(final double distance) {
 		move(0, 0, distance);
 	}
 
