@@ -498,9 +498,21 @@ public class PeasyCam {
 				animationTimeInMillis);
 	}
 
-	public void pan(final double dx, final double dy) {
-		center = center.add(rotation.applyTo(new Vector3D(dx, dy, 0)));
+	public void move(final double dx, final double dy, final double dz) {
+		center = center.add(rotation.applyTo(new Vector3D(dx, dy, dz)));
 		feed();
+	}
+
+	public void pan(final double dx, final double dy) {
+		move(dx, dy, 0);
+	}
+
+	public void pushIn(final double distance) {
+		move(0, 0, -distance);
+	}
+
+	public void pushOut(final double distance) {
+		move(0, 0, distance);
 	}
 
 	public void rotateX(final double angle) {
